@@ -43,6 +43,13 @@ public class PacketHandler {
             return;
         list.remove(handler);
     }
+
+    public void setup(PacketProcessor processor) {
+        processor.connection = this.connection;
+        processor.handler = this;
+        clearHandlers();
+        processor.register();
+    }
     
     public void clearHandlers() {
         handlers.clear();
