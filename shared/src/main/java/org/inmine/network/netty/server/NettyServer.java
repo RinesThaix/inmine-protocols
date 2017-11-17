@@ -95,7 +95,9 @@ public abstract class NettyServer extends AbstractNetworkServer {
     
     @Override
     public void sendPacket(Connection connection, Packet packet) {
-        ((NettyConnection) connection).getContext().writeAndFlush(packet);
+        ((NettyConnection) connection).getContext()
+            .writeAndFlush(packet)
+            .addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);;
     }
     
     @Override

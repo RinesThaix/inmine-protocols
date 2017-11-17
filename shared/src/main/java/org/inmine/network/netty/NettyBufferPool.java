@@ -18,7 +18,7 @@ class NettyBufferPool {
     
     public NettyBuffer wrap(ByteBuf nettyBuffer) {
         synchronized (free) {
-            NettyBuffer buf = free.getFirst();
+            NettyBuffer buf = free.poll();
             if (buf != null) {
                 buf.setHandle(nettyBuffer);
                 return buf;

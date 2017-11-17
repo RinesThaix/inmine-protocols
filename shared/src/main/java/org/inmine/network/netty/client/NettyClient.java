@@ -1,6 +1,7 @@
 package org.inmine.network.netty.client;
 
 import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOption;
 import io.netty.util.concurrent.ScheduledFuture;
@@ -75,7 +76,9 @@ public abstract class NettyClient extends AbstractNetworkClient {
     public void sendPacket(Packet packet) {
         if (this.connection == null)
             return;
-        this.connection.getContext().writeAndFlush(packet);
+        this.connection.getContext()
+            .writeAndFlush(packet)
+            .addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
     }
     
     public Logger getLogger() {
