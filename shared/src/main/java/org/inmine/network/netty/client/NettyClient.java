@@ -1,6 +1,7 @@
 package org.inmine.network.netty.client;
 
 import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOption;
@@ -26,47 +27,63 @@ public abstract class NettyClient extends AbstractNetworkClient {
     
     private ScheduledFuture<?> callbackTickFuture = null;
     private NettyConnection connection;
-
-    private final Bootstrap bootstrap;
+    
+    private ChannelFuture connectFuture;
+    private ScheduledFuture<?> reconnectFuture;
+    private Bootstrap bootstrap;
     private boolean shuttingDown;
     
     public NettyClient(Logger logger, PacketRegistry packetRegistry) {
         this.packetRegistry = packetRegistry;
         this.logger = logger;
-        this.bootstrap = new Bootstrap();
     }
     
     @Override
     public void connect(String address, int port) {
-        this.bootstrap
+        this.shuttingDown = false;
+        if (bootstrap == null) {
+            this.bootstrap = new Bootstrap()
                 .channel(NettyUtil.getChannel())
                 .group(NettyUtil.getWorkerLoopGroup())
                 .handler(new ClientChannelInitializer(this))
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
                 .remoteAddress(address, port);
-        this.callbackTickFuture = NettyUtil.getWorkerLoopGroup().scheduleWithFixedDelay(this::callbackTick, 50L, 50L, TimeUnit.MILLISECONDS);
+            this.callbackTickFuture = NettyUtil.getWorkerLoopGroup().scheduleWithFixedDelay(this::callbackTick, 50L, 50L, TimeUnit.MILLISECONDS);
+        }
         connect();
     }
-
+    
     private void connect() {
-        this.bootstrap
-                .connect()
-                .addListener((ChannelFutureListener) future -> {
-                    if (future.isSuccess()) {
-                        logger.log(Level.INFO, "Connected to the server!");
-                    } else {
-                        logger.log(Level.WARNING, "Could not connect to the server. Reconnecting in 10 seconds..", future.cause());
-                        future.channel().eventLoop().schedule((Runnable) this::connect, 10L, TimeUnit.SECONDS);
-                    }
-                });
+        reconnectFuture = null;
+        connectFuture = this.bootstrap
+            .connect()
+            .addListener((ChannelFutureListener) future -> {
+                connectFuture = null;
+                if (future.isSuccess()) {
+                    logger.log(Level.INFO, "Connected to the server!");
+                } else {
+                    logger.log(Level.WARNING, "Could not connect to the server. Reconnecting in 10 seconds..", future.cause());
+                    reconnectFuture = future.channel().eventLoop().schedule((Runnable) this::connect, 10L, TimeUnit.SECONDS);
+                }
+            });
     }
     
     @Override
     public void disconnect() {
         this.shuttingDown = true;
-        if (this.connection != null) {
+        if (connectFuture != null) {
+            connectFuture.cancel(true);
+            connectFuture = null;
+        }
+        if (reconnectFuture != null) {
+            reconnectFuture.cancel(true);
+            reconnectFuture = null;
+        }
+        if (callbackTickFuture != null) {
             callbackTickFuture.cancel(false);
             callbackTickFuture = null;
+        }
+        if (this.connection != null) {
             this.connection.getContext().channel().close().syncUninterruptibly();
             NettyUtil.shutdownLoopGroups();
             this.connection = null;
@@ -113,7 +130,7 @@ public abstract class NettyClient extends AbstractNetworkClient {
         } catch (Exception ex) {
             new Exception("Can not process disconnection callback", ex).printStackTrace();
         }
-        if(!this.shuttingDown)
+        if (!this.shuttingDown)
             connect();
     }
     
