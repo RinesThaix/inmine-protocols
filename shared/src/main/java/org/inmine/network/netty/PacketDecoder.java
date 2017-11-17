@@ -39,7 +39,7 @@ public class PacketDecoder extends ByteToMessageDecoder {
             
             readerIndex = buf.readerIndex();
             
-            int id = buffer.readVarInt();
+            int id = buffer.readSignedVarInt();
             Packet packet = this.packetRegistry.constructPacket(id);
             if (packet == null) {
                 buf.skipBytes(length);

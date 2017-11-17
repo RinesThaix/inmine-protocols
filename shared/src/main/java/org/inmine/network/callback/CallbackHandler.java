@@ -12,10 +12,10 @@ import java.util.function.Consumer;
  * Created by RINES on 17.11.17.
  */
 public class CallbackHandler {
-
+    
     private AtomicInteger callbackIdentifier = new AtomicInteger(0);
     private Map<Integer, CallbackData> callbacks = new ConcurrentHashMap<>();
-
+    
     protected void callbackTick() {
         long current = System.currentTimeMillis();
         Iterator<Map.Entry<Integer, CallbackData>> iterator = this.callbacks.entrySet().iterator();
@@ -34,14 +34,14 @@ public class CallbackHandler {
             }
         }
     }
-
+    
     protected void callCallbacksTimeouts() {
         this.callbacks.values().forEach(cdata -> {
             if (cdata.getOnTimeout() != null)
                 cdata.getOnTimeout().run();
         });
     }
-
+    
     @SuppressWarnings("unchecked")
     public <T extends Packet> void onPacketPreReceived(T packet) {
         if (packet instanceof CallbackPacket) {
@@ -58,11 +58,11 @@ public class CallbackHandler {
             }
         }
     }
-
-    protected <T extends CallbackPacket> void processCallbackPacket(T packet, Consumer<CallbackPacket> callback, long timeout, Runnable onTimeout) {
+    
+    public <T extends CallbackPacket> void registerCallback(T packet, Consumer<CallbackPacket> callback, long timeout, Runnable onTimeout) {
         int id = this.callbackIdentifier.updateAndGet(l -> l == Integer.MAX_VALUE ? 1 : l + 1);
         packet.callbackId = id;
         this.callbacks.put(id, new CallbackData(callback, timeout, onTimeout));
     }
-
+    
 }

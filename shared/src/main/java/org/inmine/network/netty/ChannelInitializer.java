@@ -30,7 +30,7 @@ public class ChannelInitializer<T extends Channel> extends io.netty.channel.Chan
     @Override
     protected void initChannel(T ch) throws Exception {
         ch.config().setAllocator(PooledByteBufAllocator.DEFAULT);
-
+        
         ch.pipeline().addLast("packet-encoder", this.encoder);
         ch.pipeline().addLast("packet-decoder", new PacketDecoder(bufferPool, this.packetRegistry));
         HandlerBoss boss = new HandlerBoss(this.packetHandlerGenerator.get(), this.logger);

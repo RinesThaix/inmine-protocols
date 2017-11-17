@@ -12,7 +12,7 @@ import java.util.function.Consumer;
 public class PacketHandler {
     
     private final Map<Class<? extends Packet>, List<Consumer<Packet>>> handlers = new HashMap<>();
-    private Connection connection;
+    protected Connection connection;
     private long lastPacketSentTime, lastPacketReceivedTime;
     
     public void handle(Packet packet) {
@@ -22,11 +22,11 @@ public class PacketHandler {
             return;
         handlers.forEach(handler -> handler.accept(packet));
     }
-
+    
     public void packetReceived() {
         this.lastPacketReceivedTime = System.currentTimeMillis();
     }
-
+    
     public void packetSent() {
         this.lastPacketSentTime = System.currentTimeMillis();
     }
@@ -55,11 +55,11 @@ public class PacketHandler {
     public Connection getConnection() {
         return this.connection;
     }
-
+    
     public long getLastPacketSentTime() {
         return lastPacketSentTime;
     }
-
+    
     public long getLastPacketReceivedTime() {
         return lastPacketReceivedTime;
     }

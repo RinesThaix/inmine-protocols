@@ -182,6 +182,21 @@ public abstract class Buffer {
         writeBytes(s.getBytes(StandardCharsets.UTF_8));
     }
     
+    public String readStringNullable(int maxLength) {
+        if (readBoolean())
+            return readString(maxLength);
+        return null;
+    }
+    
+    public void writeStringNullable(String s) {
+        if (s != null) {
+            writeBoolean(true);
+            writeString(s);
+        } else {
+            writeBoolean(false);
+        }
+    }
+    
     public <T extends Enum> T readEnum(Class<T> clazz) {
         return clazz.getEnumConstants()[readVarInt()];
     }

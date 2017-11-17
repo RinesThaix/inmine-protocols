@@ -23,7 +23,7 @@ public class PacketEncoder extends MessageToByteEncoder<Packet> {
         ByteBuf temp = ctx.alloc().buffer();
         NettyBuffer buffer = bufferPool.wrap(temp);
         try {
-            buffer.writeVarInt(packet.getId());
+            buffer.writeSignedVarInt(packet.getId());
             packet.write(buffer);
             
             buffer.setHandle(out);

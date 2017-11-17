@@ -17,7 +17,11 @@ public interface NetworkClient {
     
     Connection getConnection();
     
-    void sendPacket(Packet packet);
+    default void sendPacket(Packet packet) {
+        Connection conn = getConnection();
+        if (conn != null)
+            conn.sendPacket(packet);
+    }
     
     default <T extends CallbackPacket> void sendPacket(T packet, Consumer<CallbackPacket> callback) {
         sendPacket(packet, callback, 3000L);
@@ -27,7 +31,11 @@ public interface NetworkClient {
         sendPacket(packet, callback, timeout, null);
     }
     
-    <T extends CallbackPacket> void sendPacket(T packet, Consumer<CallbackPacket> callback, long timeout, Runnable onTimeout);
+    default <T extends CallbackPacket> void sendPacket(T packet, Consumer<CallbackPacket> callback, long timeout, Runnable onTimeout){
+        Connection conn = getConnection();
+        if (conn != null)
+            conn.sendPacket(packet, callback, timeout, onTimeout);
+    }
     
     void onConnected();
     

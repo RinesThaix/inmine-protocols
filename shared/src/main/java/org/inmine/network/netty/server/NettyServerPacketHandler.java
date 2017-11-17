@@ -4,6 +4,7 @@ import io.netty.channel.ChannelHandlerContext;
 
 import org.inmine.network.Packet;
 import org.inmine.network.netty.NettyPacketHandler;
+import org.inmine.network.packet.SPacketHandshake;
 
 /**
  * Created by RINES on 17.11.17.
@@ -14,6 +15,15 @@ public class NettyServerPacketHandler extends NettyPacketHandler {
     
     public NettyServerPacketHandler(NettyServer server) {
         this.server = server;
+        this.addHandler(SPacketHandshake.class, this::handshake);
+    }
+    
+    private void handshake(SPacketHandshake packet) {
+        if (packet.version > this.server.getPacketRegistry().getVersion()) {
+            this.connection.disconnect("Are you from future?");
+        } else if (packet.version < this.server.getPacketRegistry().getVersion()) {
+            this.connection.disconnect("Client protocol version is outdated");
+        }
     }
     
     @Override

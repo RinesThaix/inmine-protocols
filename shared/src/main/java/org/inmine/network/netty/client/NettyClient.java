@@ -7,13 +7,15 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOption;
 import io.netty.util.concurrent.ScheduledFuture;
 
+import org.inmine.network.NetworkClient;
 import org.inmine.network.Packet;
 import org.inmine.network.PacketRegistry;
-import org.inmine.network.callback.AbstractNetworkClient;
+import org.inmine.network.callback.CallbackHandler;
 import org.inmine.network.netty.NettyConnection;
 import org.inmine.network.netty.NettyPacketHandler;
 import org.inmine.network.netty.NettyUtil;
-import org.inmine.network.packet.Packet0KeepAlive;
+import org.inmine.network.packet.SPacketHandshake;
+import org.inmine.network.packet.SPacketKeepAlive;
 
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.TimeUnit;
@@ -23,7 +25,7 @@ import java.util.logging.Logger;
 /**
  * Created by RINES on 17.11.17.
  */
-public abstract class NettyClient extends AbstractNetworkClient {
+public abstract class NettyClient extends CallbackHandler implements NetworkClient {
     
     private final PacketRegistry packetRegistry;
     private final Logger logger;
@@ -69,7 +71,7 @@ public abstract class NettyClient extends AbstractNetworkClient {
                     return;
                 }
                 if (current - handler.getLastPacketSentTime() > 30000L) {
-                    sendPacket(new Packet0KeepAlive());
+                    sendPacket(new SPacketKeepAlive());
                 }
             }, 1L, 1L, TimeUnit.SECONDS);
         bootstrap.remoteAddress(address, port);
@@ -136,10 +138,7 @@ public abstract class NettyClient extends AbstractNetworkClient {
     public void sendPacket(Packet packet) {
         if (this.connection == null)
             return;
-        this.connection.getHandler().packetSent();
-        this.connection.getContext()
-            .writeAndFlush(packet)
-            .addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
+        this.connection.sendPacket(packet);
     }
     
     public Logger getLogger() {
@@ -147,8 +146,9 @@ public abstract class NettyClient extends AbstractNetworkClient {
     }
     
     NettyConnection createConnection(ChannelHandlerContext ctx, NettyClientPacketHandler handler) {
-        this.connection = new NettyConnection(ctx, handler);
+        this.connection = new NettyConnection(this, ctx, handler);
         try {
+            sendPacket(new SPacketHandshake(getPacketRegistry().getVersion()));
             onConnected();
         } catch (Exception ex) {
             new Exception("Can not process connection callback", ex).printStackTrace();

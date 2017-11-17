@@ -7,13 +7,14 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.concurrent.ScheduledFuture;
 
 import org.inmine.network.Connection;
-import org.inmine.network.Packet;
+import org.inmine.network.NetworkServer;
 import org.inmine.network.PacketRegistry;
-import org.inmine.network.callback.AbstractNetworkServer;
+import org.inmine.network.callback.CallbackHandler;
 import org.inmine.network.netty.NettyConnection;
 import org.inmine.network.netty.NettyPacketHandler;
 import org.inmine.network.netty.NettyUtil;
-import org.inmine.network.packet.Packet0KeepAlive;
+import org.inmine.network.packet.SPacketHandshake;
+import org.inmine.network.packet.SPacketKeepAlive;
 
 import java.net.SocketAddress;
 import java.util.Collection;
@@ -26,7 +27,7 @@ import java.util.logging.Logger;
 /**
  * Created by RINES on 17.11.17.
  */
-public abstract class NettyServer extends AbstractNetworkServer {
+public abstract class NettyServer extends CallbackHandler implements NetworkServer {
     
     private final PacketRegistry packetRegistry;
     private final Logger logger;
@@ -70,11 +71,11 @@ public abstract class NettyServer extends AbstractNetworkServer {
                 this.connections.values().forEach(connection -> {
                     NettyPacketHandler handler = connection.getHandler();
                     if (current - handler.getLastPacketReceivedTime() > 40000L) {
-                        connection.getContext().close();
+                        connection.disconnect();
                         return;
                     }
                     if (current - handler.getLastPacketSentTime() > 30000L) {
-                        sendPacket(connection, new Packet0KeepAlive());
+                        connection.sendPacket(new SPacketKeepAlive());
                     }
                 });
             }, 5L, 5L, TimeUnit.SECONDS);
@@ -86,7 +87,7 @@ public abstract class NettyServer extends AbstractNetworkServer {
             callbackTickFuture.cancel(false);
             callbackTickFuture = null;
         }
-        if( keepAliveFuture != null) {
+        if (keepAliveFuture != null) {
             keepAliveFuture.cancel(false);
             keepAliveFuture = null;
         }
@@ -118,15 +119,6 @@ public abstract class NettyServer extends AbstractNetworkServer {
     }
     
     @Override
-    public void sendPacket(Connection connection, Packet packet) {
-        NettyConnection ncon = (NettyConnection) connection;
-        ncon.getHandler().packetSent();
-        ncon.getContext()
-            .writeAndFlush(packet)
-            .addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
-    }
-    
-    @Override
     public final void onNewConnection(Connection connection) {
         onNewConnection((NettyConnection) connection);
     }
@@ -145,8 +137,15 @@ public abstract class NettyServer extends AbstractNetworkServer {
     }
     
     NettyConnection createNewConnection(ChannelHandlerContext ctx, NettyServerPacketHandler handler) {
-        NettyConnection connection = new NettyConnection(ctx, handler);
+        NettyConnection connection = new NettyConnection(this, ctx, handler);
         this.connections.put(ctx.channel().remoteAddress(), connection);
+        connection.getHandler().addHandler(SPacketHandshake.class, handshake -> {
+            if (handshake.version > getPacketRegistry().getVersion()) {
+                connection.disconnect("Are you from future?");
+            } else if (handshake.version < getPacketRegistry().getVersion()) {
+                connection.disconnect("Client protocol version is outdated");
+            }
+        });
         try {
             onNewConnection(connection);
         } catch (Exception ex) {
@@ -156,10 +155,11 @@ public abstract class NettyServer extends AbstractNetworkServer {
     }
     
     void deleteConnection(ChannelHandlerContext ctx) {
-        Connection connection = this.connections.remove(ctx.channel().remoteAddress());
+        NettyConnection connection = this.connections.remove(ctx.channel().remoteAddress());
         if (connection == null)
             return;
         try {
+            connection.getHandler().setConnection(null);
             onDisconnecting(connection);
         } catch (Exception ex) {
             new Exception("Can not process disconnection callback", ex).printStackTrace();

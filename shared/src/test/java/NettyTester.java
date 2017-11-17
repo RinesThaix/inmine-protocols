@@ -2,8 +2,10 @@ import org.inmine.network.Buffer;
 import org.inmine.network.Packet;
 import org.inmine.network.PacketRegistry;
 import org.inmine.network.netty.NettyConnection;
+import org.inmine.network.netty.NettyUtil;
 import org.inmine.network.netty.client.NettyClient;
 import org.inmine.network.netty.server.NettyServer;
+import org.inmine.network.packet.SPacketDisconnect;
 import org.inmine.util.OwnLogger;
 
 import java.util.Random;
@@ -17,10 +19,10 @@ public class NettyTester {
         OwnLogger logger = new OwnLogger("test");
         TestPacketRegistry registry = new TestPacketRegistry();
         NettyServer server = new NettyServer(logger, registry) {
-
+            
             private boolean closed;
             private int a = 0;
-
+            
             @Override
             public void onNewConnection(NettyConnection connection) {
                 logger.info("Server has just received the client!");
@@ -34,7 +36,7 @@ public class NettyTester {
                     logger.info("Server received packet with id " + p.id);
                     ++p.id;
                     p.random = String.valueOf(new Random().nextInt());
-                    sendPacket(connection, p.id == 10 ? new PacketDisconnect() : p);
+                    connection.sendPacket(p.id == 10 ? new SPacketDisconnect() : p);
                 });
             }
             
@@ -44,6 +46,7 @@ public class NettyTester {
                     return;
                 logger.info("Stopping the server..");
                 stop();
+                NettyUtil.shutdownLoopGroups();
             }
         };
         NettyClient client = new NettyClient(logger, registry) {
@@ -57,7 +60,7 @@ public class NettyTester {
                     p.random = String.valueOf(new Random().nextInt());
                     sendPacket(p);
                 });
-                getConnection().getHandler().addHandler(PacketDisconnect.class, p -> {
+                getConnection().getHandler().addHandler(SPacketDisconnect.class, p -> {
                     logger.info("Client received disconnecting packet");
                     disconnect();
                 });
@@ -74,13 +77,12 @@ public class NettyTester {
         };
         server.start("localhost", 8940);
         client.connect("localhost", 8940);
-        client.disconnect();
     }
     
     private static class TestPacketRegistry extends PacketRegistry {
         
         private TestPacketRegistry() {
-            super(PacketTest::new, PacketDisconnect::new);
+            super(1, PacketTest::new);
         }
         
     }
@@ -108,24 +110,4 @@ public class NettyTester {
         }
         
     }
-    
-    public static class PacketDisconnect extends Packet {
-        
-        @Override
-        public int getId() {
-            return 2;
-        }
-        
-        @Override
-        public void write(Buffer buffer) {
-            
-        }
-        
-        @Override
-        public void read(Buffer buffer) {
-            
-        }
-        
-    }
-    
 }
