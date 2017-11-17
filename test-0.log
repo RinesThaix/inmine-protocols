@@ -1,0 +1,85 @@
+22:34:03 [INFO] TCP listening on localhost:8940
+22:34:03 [INFO] Server has just received the client!
+22:34:03 [INFO] Connected to the server!
+22:34:03 [INFO] Client has just connected to the server!
+22:34:21 [INFO] TCP listening on localhost:8940
+22:34:21 [INFO] Server has just received the client!
+22:34:21 [INFO] Connected to the server!
+22:34:21 [INFO] Client has just connected to the server!
+22:34:35 [INFO] TCP listening on localhost:8940
+22:34:35 [INFO] Server has just received the client!
+22:34:35 [INFO] Connected to the server!
+22:34:35 [INFO] Client has just connected to the server!
+22:34:45 [INFO] TCP listening on localhost:8940
+22:34:46 [INFO] Server has just received the client!
+22:34:46 [INFO] Connected to the server!
+22:34:46 [INFO] Client has just connected to the server!
+22:36:42 [INFO] TCP listening on localhost:8940
+22:36:42 [INFO] Server has just received the client!
+22:36:42 [INFO] Connected to the server!
+22:36:42 [INFO] Client has just connected to the server!
+22:36:56 [INFO] TCP listening on localhost:8940
+22:36:56 [INFO] Server has just received the client!
+22:36:56 [INFO] Connected to the server!
+22:36:56 [INFO] Client has just connected to the server!
+22:38:09 [INFO] TCP listening on localhost:8940
+22:38:09 [INFO] Server has just received the client!
+22:38:09 [INFO] Connected to the server!
+22:38:09 [INFO] Client has just connected to the server!
+22:38:09 [SEVERE] java.util.NoSuchElementException
+22:38:09 [SEVERE] 	at java.util.LinkedList.getFirst(LinkedList.java:244)
+22:38:09 [SEVERE] 	at org.inmine.network.netty.NettyBufferPool.wrap(NettyBufferPool.java:21)
+22:38:09 [SEVERE] 	at org.inmine.network.netty.PacketEncoder.encode(PacketEncoder.java:26)
+22:38:09 [SEVERE] 	at org.inmine.network.netty.PacketEncoder.encode(PacketEncoder.java:13)
+22:38:09 [SEVERE] 	at io.netty.handler.codec.MessageToByteEncoder.write(MessageToByteEncoder.java:107)
+22:38:09 [SEVERE] 	at io.netty.channel.AbstractChannelHandlerContext.invokeWrite0(AbstractChannelHandlerContext.java:738)
+22:38:09 [SEVERE] 	at io.netty.channel.AbstractChannelHandlerContext.invokeWriteAndFlush(AbstractChannelHandlerContext.java:801)
+22:38:09 [SEVERE] 	at io.netty.channel.AbstractChannelHandlerContext.write(AbstractChannelHandlerContext.java:814)
+22:38:09 [SEVERE] 	at io.netty.channel.AbstractChannelHandlerContext.writeAndFlush(AbstractChannelHandlerContext.java:794)
+22:38:09 [SEVERE] 	at io.netty.channel.AbstractChannelHandlerContext.writeAndFlush(AbstractChannelHandlerContext.java:831)
+22:38:09 [SEVERE] 	at org.inmine.network.netty.client.NettyClient.sendPacket(NettyClient.java:78)
+22:38:09 [SEVERE] 	at NettyTester$2.onConnected(NettyTester.java:56)
+22:38:09 [SEVERE] 	at org.inmine.network.netty.client.NettyClient.createConnection(NettyClient.java:88)
+22:38:09 [SEVERE] 	at org.inmine.network.netty.client.NettyClientPacketHandler.onConnect(NettyClientPacketHandler.java:27)
+22:38:09 [SEVERE] 	at org.inmine.network.netty.HandlerBoss.channelActive(HandlerBoss.java:44)
+22:38:09 [SEVERE] 	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelActive(AbstractChannelHandlerContext.java:213)
+22:38:09 [SEVERE] 	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelActive(AbstractChannelHandlerContext.java:199)
+22:38:09 [SEVERE] 	at io.netty.channel.AbstractChannelHandlerContext.fireChannelActive(AbstractChannelHandlerContext.java:192)
+22:38:09 [SEVERE] 	at io.netty.channel.ChannelInboundHandlerAdapter.channelActive(ChannelInboundHandlerAdapter.java:64)
+22:38:09 [SEVERE] 	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelActive(AbstractChannelHandlerContext.java:213)
+22:38:09 [SEVERE] 	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelActive(AbstractChannelHandlerContext.java:199)
+22:38:09 [SEVERE] 	at io.netty.channel.AbstractChannelHandlerContext.fireChannelActive(AbstractChannelHandlerContext.java:192)
+22:38:09 [SEVERE] 	at io.netty.channel.ChannelInboundHandlerAdapter.channelActive(ChannelInboundHandlerAdapter.java:64)
+22:38:09 [SEVERE] 	at io.netty.handler.timeout.IdleStateHandler.channelActive(IdleStateHandler.java:271)
+22:38:09 [SEVERE] 	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelActive(AbstractChannelHandlerContext.java:213)
+22:38:09 [SEVERE] 	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelActive(AbstractChannelHandlerContext.java:199)
+22:38:09 [SEVERE] 	at io.netty.channel.AbstractChannelHandlerContext.fireChannelActive(AbstractChannelHandlerContext.java:192)
+22:38:09 [SEVERE] 	at io.netty.channel.DefaultChannelPipeline$HeadContext.channelActive(DefaultChannelPipeline.java:1347)
+22:38:09 [SEVERE] 	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelActive(AbstractChannelHandlerContext.java:213)
+22:38:09 [SEVERE] 	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelActive(AbstractChannelHandlerContext.java:199)
+22:38:09 [SEVERE] 	at io.netty.channel.DefaultChannelPipeline.fireChannelActive(DefaultChannelPipeline.java:911)
+22:38:09 [SEVERE] 	at io.netty.channel.nio.AbstractNioChannel$AbstractNioUnsafe.fulfillConnectPromise(AbstractNioChannel.java:311)
+22:38:09 [SEVERE] 	at io.netty.channel.nio.AbstractNioChannel$AbstractNioUnsafe.finishConnect(AbstractNioChannel.java:341)
+22:38:09 [SEVERE] 	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:633)
+22:38:09 [SEVERE] 	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:580)
+22:38:09 [SEVERE] 	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:497)
+22:38:09 [SEVERE] 	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:459)
+22:38:09 [SEVERE] 	at io.netty.util.concurrent.SingleThreadEventExecutor$5.run(SingleThreadEventExecutor.java:858)
+22:38:09 [SEVERE] 	at java.lang.Thread.run(Thread.java:748)
+22:39:05 [INFO] TCP listening on localhost:8940
+22:39:05 [INFO] Server has just received the client!
+22:39:05 [INFO] Connected to the server!
+22:39:05 [INFO] Client has just connected to the server!
+22:39:05 [INFO] Server received packet with id 1
+22:39:05 [INFO] Client received packet with id 2
+22:39:05 [INFO] Server received packet with id 3
+22:39:05 [INFO] Client received packet with id 4
+22:39:05 [INFO] Server received packet with id 5
+22:39:05 [INFO] Client received packet with id 6
+22:39:05 [INFO] Server received packet with id 7
+22:39:05 [INFO] Client received packet with id 8
+22:39:05 [INFO] Server received packet with id 9
+22:39:05 [INFO] Client received disconnecting packet
+22:39:05 [INFO] Disconnecting the client..
+22:39:05 [INFO] Stopping the server..
+22:39:05 [INFO] Closing tcp listener

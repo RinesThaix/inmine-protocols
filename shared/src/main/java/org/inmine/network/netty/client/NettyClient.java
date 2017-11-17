@@ -26,33 +26,43 @@ public abstract class NettyClient extends AbstractNetworkClient {
     
     private ScheduledFuture<?> callbackTickFuture = null;
     private NettyConnection connection;
+
+    private final Bootstrap bootstrap;
+    private boolean shuttingDown;
     
     public NettyClient(Logger logger, PacketRegistry packetRegistry) {
         this.packetRegistry = packetRegistry;
         this.logger = logger;
+        this.bootstrap = new Bootstrap()
+                        .channel(NettyUtil.getChannel())
+                        .group(NettyUtil.getWorkerLoopGroup())
+                        .handler(new ClientChannelInitializer(this))
+                        .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000);
+        this.callbackTickFuture = NettyUtil.getWorkerLoopGroup().scheduleWithFixedDelay(this::callbackTick, 50L, 50L, TimeUnit.MILLISECONDS);
     }
     
     @Override
     public void connect(String address, int port) {
-        new Bootstrap()
-            .channel(NettyUtil.getChannel())
-            .group(NettyUtil.getWorkerLoopGroup())
-            .handler(new ClientChannelInitializer(this))
-            .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
-            .remoteAddress(address, port)
-            .connect()
-            .addListener(future -> {
-                if (future.isSuccess()) {
-                    logger.log(Level.INFO, "Connected to the server!");
-                } else {
-                    logger.log(Level.WARNING, "Could not connect to " + address + ":" + port, future.cause());
-                }
-            });
-        callbackTickFuture = NettyUtil.getWorkerLoopGroup().scheduleWithFixedDelay(this::callbackTick, 50L, 50L, TimeUnit.MILLISECONDS);
+        this.bootstrap.remoteAddress(address, port);
+        connect();
+    }
+
+    private void connect() {
+        this.bootstrap
+                .connect()
+                .addListener((ChannelFutureListener) future -> {
+                    if (future.isSuccess()) {
+                        logger.log(Level.INFO, "Connected to the server!");
+                    } else {
+                        logger.log(Level.WARNING, "Could not connect to the server. Reconnecting in 1 second..", future.cause());
+                        future.channel().eventLoop().schedule((Runnable) this::connect, 1L, TimeUnit.SECONDS);
+                    }
+                });
     }
     
     @Override
     public void disconnect() {
+        this.shuttingDown = true;
         if (this.connection != null) {
             callbackTickFuture.cancel(false);
             callbackTickFuture = null;
@@ -102,6 +112,8 @@ public abstract class NettyClient extends AbstractNetworkClient {
         } catch (Exception ex) {
             new Exception("Can not process disconnection callback", ex).printStackTrace();
         }
+        if(!this.shuttingDown)
+            connect();
     }
     
 }
