@@ -37,6 +37,8 @@ public class NettyUtil {
     public synchronized static void shutdownLoopGroups() {
         if (bossLoopGroup != null) {
             bossLoopGroup.shutdownGracefully();
+            if (bossIsWorker)
+                workerLoopGroup = null;
             bossLoopGroup = null;
         }
         if (workerLoopGroup != null) {
