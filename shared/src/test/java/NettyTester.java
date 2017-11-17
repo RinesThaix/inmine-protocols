@@ -6,6 +6,8 @@ import org.inmine.network.netty.client.NettyClient;
 import org.inmine.network.netty.server.NettyServer;
 import org.inmine.util.OwnLogger;
 
+import java.util.Random;
+
 /**
  * Created by RINES on 17.11.17.
  */
@@ -21,6 +23,7 @@ public class NettyTester {
                 connection.getHandler().addHandler(PacketTest.class, p -> {
                     logger.info("Server received packet with id " + p.id);
                     ++p.id;
+                    p.random = String.valueOf(new Random().nextInt());
                     sendPacket(connection, p.id == 10 ? new PacketDisconnect() : p);
                 });
             }
@@ -40,6 +43,7 @@ public class NettyTester {
                 getConnection().getHandler().addHandler(PacketTest.class, p -> {
                     logger.info("Client received packet with id " + p.id);
                     ++p.id;
+                    p.random = String.valueOf(new Random().nextInt());
                     sendPacket(p);
                 });
                 getConnection().getHandler().addHandler(PacketDisconnect.class, p -> {
@@ -47,6 +51,7 @@ public class NettyTester {
                     disconnect();
                 });
                 PacketTest packet = new PacketTest();
+                packet.random = String.valueOf(new Random().nextInt());
                 packet.id = 1;
                 sendPacket(packet);
             }
@@ -69,6 +74,7 @@ public class NettyTester {
     
     public static class PacketTest extends Packet {
         
+        private String random;
         private long id;
         
         @Override
@@ -79,11 +85,13 @@ public class NettyTester {
         @Override
         public void write(Buffer buffer) {
             buffer.writeVarLong(this.id);
+            buffer.writeString(random);
         }
         
         @Override
         public void read(Buffer buffer) {
             this.id = buffer.readVarLong();
+            this.random = buffer.readString(255);
         }
         
     }

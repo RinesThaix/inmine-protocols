@@ -27,6 +27,10 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
         this.logger = logger;
     }
     
+    public Logger getLogger() {
+        return logger;
+    }
+    
     public NettyPacketHandler getHandler() {
         return this.handler;
     }

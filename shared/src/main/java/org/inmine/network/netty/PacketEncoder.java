@@ -12,18 +12,26 @@ import org.inmine.network.Packet;
  */
 @ChannelHandler.Sharable
 public class PacketEncoder extends MessageToByteEncoder<Packet> {
+    private final NettyBufferPool bufferPool;
+    
+    public PacketEncoder(NettyBufferPool bufferPool) {
+        this.bufferPool = bufferPool;
+    }
+    
     @Override
     protected void encode(ChannelHandlerContext ctx, Packet packet, ByteBuf out) throws Exception {
-        ByteBuf buf = ctx.alloc().buffer();
-        NettyBuffer buffer = new NettyBuffer(buf);
+        ByteBuf temp = ctx.alloc().buffer();
+        NettyBuffer buffer = bufferPool.wrap(temp);
         try {
-            buffer.writeShort((short) packet.getId());
+            buffer.writeVarInt(packet.getId());
             packet.write(buffer);
-            NettyBuffer outbuffer = new NettyBuffer(out);
-            outbuffer.writeVarInt(buf.readableBytes());
-            outbuffer.getByteBuf().writeBytes(buf);
+            
+            buffer.setHandle(out);
+            buffer.writeVarInt(temp.readableBytes());
+            out.writeBytes(temp);
         } finally {
-            buf.release();
+            buffer.release();
+            temp.release();
         }
     }
 }

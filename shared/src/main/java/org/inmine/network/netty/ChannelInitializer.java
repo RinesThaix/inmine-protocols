@@ -15,7 +15,8 @@ import java.util.logging.Logger;
  */
 public class ChannelInitializer<T extends Channel> extends io.netty.channel.ChannelInitializer<T> {
     
-    private final PacketEncoder encoder = new PacketEncoder();
+    private final NettyBufferPool bufferPool;
+    private final PacketEncoder encoder;
     private final PacketRegistry packetRegistry;
     private final Supplier<NettyPacketHandler> packetHandlerGenerator;
     private final Logger logger;
@@ -24,6 +25,8 @@ public class ChannelInitializer<T extends Channel> extends io.netty.channel.Chan
         this.packetRegistry = packetRegistry;
         this.packetHandlerGenerator = packetHandlerGenerator;
         this.logger = logger;
+        this.bufferPool = new NettyBufferPool(100);
+        this.encoder = new PacketEncoder(bufferPool);
     }
     
     @Override
@@ -32,7 +35,7 @@ public class ChannelInitializer<T extends Channel> extends io.netty.channel.Chan
         
         ch.pipeline().addLast("timeout", new ReadTimeoutHandler(10, TimeUnit.MINUTES));
         ch.pipeline().addLast("packet-encoder", this.encoder);
-        ch.pipeline().addLast("packet-decoder", new PacketDecoder(this.packetRegistry));
+        ch.pipeline().addLast("packet-decoder", new PacketDecoder(bufferPool, this.packetRegistry));
         HandlerBoss boss = new HandlerBoss(this.packetHandlerGenerator.get(), this.logger);
         ch.pipeline().addLast("boss", boss);
         ch.attr(HandlerBoss.BOSS_KEY).set(boss);

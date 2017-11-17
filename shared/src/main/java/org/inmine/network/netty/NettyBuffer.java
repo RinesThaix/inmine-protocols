@@ -13,10 +13,29 @@ import java.nio.charset.StandardCharsets;
  */
 public class NettyBuffer extends Buffer {
     
-    private final ByteBuf buffer;
+    private final NettyBufferPool pool;
+    private ByteBuf buffer;
     
     public NettyBuffer(ByteBuf buffer) {
+        this(null, buffer);
+    }
+    
+    NettyBuffer(NettyBufferPool pool, ByteBuf buffer) {
+        this.pool = pool;
         this.buffer = buffer;
+    }
+    
+    public void setHandle(ByteBuf buffer) {
+        this.buffer = buffer;
+    }
+    
+    public ByteBuf getHandle() {
+        return this.buffer;
+    }
+    
+    public void release() {
+        if (pool != null)
+            pool.release(this);
     }
     
     @Override
@@ -101,10 +120,6 @@ public class NettyBuffer extends Buffer {
         } finally {
             encoded.release();
         }
-    }
-    
-    public ByteBuf getByteBuf() {
-        return this.buffer;
     }
     
 }
