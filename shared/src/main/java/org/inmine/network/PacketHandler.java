@@ -46,7 +46,6 @@ public class PacketHandler {
 
     public void setup(PacketProcessor processor) {
         processor.connection = this.connection;
-        processor.handler = this;
         clearHandlers();
         processor.register();
     }
