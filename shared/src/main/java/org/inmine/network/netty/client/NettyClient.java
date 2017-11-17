@@ -13,6 +13,7 @@ import org.inmine.network.callback.AbstractNetworkClient;
 import org.inmine.network.netty.NettyConnection;
 import org.inmine.network.netty.NettyUtil;
 
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -63,7 +64,8 @@ public abstract class NettyClient extends AbstractNetworkClient {
                     logger.log(Level.INFO, "Connected to the server!");
                 } else {
                     logger.log(Level.WARNING, "Could not connect to the server. Reconnecting in 10 seconds..", future.cause());
-                    reconnectFuture = future.channel().eventLoop().schedule((Runnable) this::connect, 10L, TimeUnit.SECONDS);
+                    if(!(future.cause() instanceof CancellationException))
+                        reconnectFuture = future.channel().eventLoop().schedule((Runnable) this::connect, 10L, TimeUnit.SECONDS);
                 }
             });
     }

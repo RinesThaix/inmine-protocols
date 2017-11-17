@@ -17,10 +17,20 @@ public class NettyTester {
         OwnLogger logger = new OwnLogger("test");
         TestPacketRegistry registry = new TestPacketRegistry();
         NettyServer server = new NettyServer(logger, registry) {
+
+            private boolean closed;
+            private int a = 0;
+
             @Override
             public void onNewConnection(NettyConnection connection) {
                 logger.info("Server has just received the client!");
                 connection.getHandler().addHandler(PacketTest.class, p -> {
+                    if(!closed) {
+                        closed = true;
+                        connection.getContext().close().syncUninterruptibly();
+                        logger.info("DISCONNECTING");
+                        return;
+                    }
                     logger.info("Server received packet with id " + p.id);
                     ++p.id;
                     p.random = String.valueOf(new Random().nextInt());
@@ -30,11 +40,12 @@ public class NettyTester {
             
             @Override
             public void onDisconnecting(NettyConnection connection) {
+                if(++a < 2)
+                    return;
                 logger.info("Stopping the server..");
                 stop();
             }
         };
-        server.start("localhost", 8940);
         NettyClient client = new NettyClient(logger, registry) {
             
             @Override
@@ -61,7 +72,9 @@ public class NettyTester {
                 logger.info("Disconnecting the client..");
             }
         };
+        server.start("localhost", 8940);
         client.connect("localhost", 8940);
+        client.disconnect();
     }
     
     private static class TestPacketRegistry extends PacketRegistry {
