@@ -12,6 +12,7 @@ import java.util.function.Supplier;
  * Created by RINES on 17.11.17.
  */
 public class PacketRegistry {
+    private static final int SHARED_PROTOCOL_VERSION = 1;
     
     private final int version;
     private final Map<Integer, Supplier<Packet>> constructors = new HashMap<>();
@@ -35,6 +36,6 @@ public class PacketRegistry {
     }
     
     public int getVersion() {
-        return version;
+        return version + 1000 * SHARED_PROTOCOL_VERSION;
     }
 }
