@@ -33,17 +33,18 @@ public abstract class NettyClient extends AbstractNetworkClient {
     public NettyClient(Logger logger, PacketRegistry packetRegistry) {
         this.packetRegistry = packetRegistry;
         this.logger = logger;
-        this.bootstrap = new Bootstrap()
-                        .channel(NettyUtil.getChannel())
-                        .group(NettyUtil.getWorkerLoopGroup())
-                        .handler(new ClientChannelInitializer(this))
-                        .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000);
-        this.callbackTickFuture = NettyUtil.getWorkerLoopGroup().scheduleWithFixedDelay(this::callbackTick, 50L, 50L, TimeUnit.MILLISECONDS);
+        this.bootstrap = new Bootstrap();
     }
     
     @Override
     public void connect(String address, int port) {
-        this.bootstrap.remoteAddress(address, port);
+        this.bootstrap
+                .channel(NettyUtil.getChannel())
+                .group(NettyUtil.getWorkerLoopGroup())
+                .handler(new ClientChannelInitializer(this))
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
+                .remoteAddress(address, port);
+        this.callbackTickFuture = NettyUtil.getWorkerLoopGroup().scheduleWithFixedDelay(this::callbackTick, 50L, 50L, TimeUnit.MILLISECONDS);
         connect();
     }
 
@@ -54,8 +55,8 @@ public abstract class NettyClient extends AbstractNetworkClient {
                     if (future.isSuccess()) {
                         logger.log(Level.INFO, "Connected to the server!");
                     } else {
-                        logger.log(Level.WARNING, "Could not connect to the server. Reconnecting in 1 second..", future.cause());
-                        future.channel().eventLoop().schedule((Runnable) this::connect, 1L, TimeUnit.SECONDS);
+                        logger.log(Level.WARNING, "Could not connect to the server. Reconnecting in 10 seconds..", future.cause());
+                        future.channel().eventLoop().schedule((Runnable) this::connect, 10L, TimeUnit.SECONDS);
                     }
                 });
     }
