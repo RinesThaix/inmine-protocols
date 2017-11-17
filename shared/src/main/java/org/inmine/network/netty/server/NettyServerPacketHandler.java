@@ -24,6 +24,12 @@ public class NettyServerPacketHandler extends NettyPacketHandler {
         } else if (packet.version < this.server.getPacketRegistry().getVersion()) {
             this.connection.disconnect("Client protocol version is outdated");
         }
+        this.removeHandler(SPacketHandshake.class, this::handshake);
+        try {
+            server.onNewConnection(connection);
+        } catch (Exception ex) {
+            new Exception("Can not process connection callback", ex).printStackTrace();
+        }
     }
     
     @Override

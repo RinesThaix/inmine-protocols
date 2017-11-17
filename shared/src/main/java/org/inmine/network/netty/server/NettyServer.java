@@ -13,7 +13,6 @@ import org.inmine.network.callback.CallbackHandler;
 import org.inmine.network.netty.NettyConnection;
 import org.inmine.network.netty.NettyPacketHandler;
 import org.inmine.network.netty.NettyUtil;
-import org.inmine.network.packet.SPacketHandshake;
 import org.inmine.network.packet.SPacketKeepAlive;
 
 import java.net.SocketAddress;
@@ -139,18 +138,6 @@ public abstract class NettyServer extends CallbackHandler implements NetworkServ
     NettyConnection createNewConnection(ChannelHandlerContext ctx, NettyServerPacketHandler handler) {
         NettyConnection connection = new NettyConnection(this, ctx, handler);
         this.connections.put(ctx.channel().remoteAddress(), connection);
-        connection.getHandler().addHandler(SPacketHandshake.class, handshake -> {
-            if (handshake.version > getPacketRegistry().getVersion()) {
-                connection.disconnect("Are you from future?");
-            } else if (handshake.version < getPacketRegistry().getVersion()) {
-                connection.disconnect("Client protocol version is outdated");
-            }
-        });
-        try {
-            onNewConnection(connection);
-        } catch (Exception ex) {
-            new Exception("Can not process connection callback", ex).printStackTrace();
-        }
         return connection;
     }
     

@@ -157,6 +157,7 @@ public abstract class NettyClient extends CallbackHandler implements NetworkClie
     }
     
     void deleteConnection(ChannelHandlerContext ctx) {
+        this.connection.getHandler().setConnection(null);
         this.connection = null;
         try {
             onDisconnected();
