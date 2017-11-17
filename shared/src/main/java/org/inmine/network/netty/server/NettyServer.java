@@ -86,6 +86,10 @@ public abstract class NettyServer extends AbstractNetworkServer {
             callbackTickFuture.cancel(false);
             callbackTickFuture = null;
         }
+        if( keepAliveFuture != null) {
+            keepAliveFuture.cancel(false);
+            keepAliveFuture = null;
+        }
         super.callCallbacksTimeouts();
         if (channel != null) {
             logger.info("Closing tcp listener");
