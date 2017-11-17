@@ -1,4 +1,7 @@
-package org.inmine.network;
+package org.inmine.network.callback;
+
+import org.inmine.network.Buffer;
+import org.inmine.network.Packet;
 
 /**
  * @author xtrafrancyz

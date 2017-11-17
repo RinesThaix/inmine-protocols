@@ -1,5 +1,7 @@
 package org.inmine.network;
 
+import org.inmine.network.callback.CallbackPacket;
+
 import java.util.function.Consumer;
 
 /**

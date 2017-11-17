@@ -20,7 +20,7 @@ public class NettyServerPacketHandler extends NettyPacketHandler {
     @Override
     public void handle(Packet packet) {
         Connection connection = getConnection();
-        this.server.onPacketPreReceived(connection, packet);
+        this.server.onPacketPreReceived(packet);
         super.handle(packet);
     }
     
