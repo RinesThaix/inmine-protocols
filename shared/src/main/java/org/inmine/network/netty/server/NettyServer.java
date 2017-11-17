@@ -64,12 +64,13 @@ public abstract class NettyServer extends AbstractNetworkServer {
     
     @Override
     public void stop() {
-        if (channel != null) {
+        if (callbackTickFuture != null) {
             callbackTickFuture.cancel(false);
             callbackTickFuture = null;
+        }
+        if (channel != null) {
             logger.info("Closing tcp listener");
             channel.close().syncUninterruptibly();
-            NettyUtil.shutdownLoopGroups();
         }
     }
     
@@ -97,7 +98,7 @@ public abstract class NettyServer extends AbstractNetworkServer {
     public void sendPacket(Connection connection, Packet packet) {
         ((NettyConnection) connection).getContext()
             .writeAndFlush(packet)
-            .addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);;
+            .addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
     }
     
     @Override

@@ -33,6 +33,7 @@ public abstract class NettyClient extends AbstractNetworkClient {
     private ScheduledFuture<?> reconnectFuture;
     private Bootstrap bootstrap;
     private boolean shuttingDown;
+    private boolean logReconnectMessage;
     
     public NettyClient(Logger logger, PacketRegistry packetRegistry) {
         this.packetRegistry = packetRegistry;
@@ -42,15 +43,17 @@ public abstract class NettyClient extends AbstractNetworkClient {
     @Override
     public void connect(String address, int port) {
         this.shuttingDown = false;
+        this.logReconnectMessage = true;
         if (bootstrap == null) {
             this.bootstrap = new Bootstrap()
                 .channel(NettyUtil.getChannel())
                 .group(NettyUtil.getWorkerLoopGroup())
                 .handler(new ClientChannelInitializer(this))
-                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
-                .remoteAddress(address, port);
-            this.callbackTickFuture = NettyUtil.getWorkerLoopGroup().scheduleWithFixedDelay(this::callbackTick, 50L, 50L, TimeUnit.MILLISECONDS);
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000);
         }
+        if (callbackTickFuture == null)
+            this.callbackTickFuture = NettyUtil.getWorkerLoopGroup().scheduleWithFixedDelay(this::callbackTick, 50L, 50L, TimeUnit.MILLISECONDS);
+        bootstrap.remoteAddress(address, port);
         connect();
     }
     
@@ -62,9 +65,13 @@ public abstract class NettyClient extends AbstractNetworkClient {
                 connectFuture = null;
                 if (future.isSuccess()) {
                     logger.log(Level.INFO, "Connected to the server!");
+                    logReconnectMessage = true;
                 } else {
-                    logger.log(Level.WARNING, "Could not connect to the server. Reconnecting in 10 seconds..", future.cause());
-                    if(!(future.cause() instanceof CancellationException))
+                    if (logReconnectMessage) {
+                        logger.log(Level.WARNING, "Could not connect to the server. I will connect as soon as the server is online..", future.cause());
+                        logReconnectMessage = false;
+                    }
+                    if (!(future.cause() instanceof CancellationException))
                         reconnectFuture = future.channel().eventLoop().schedule((Runnable) this::connect, 10L, TimeUnit.SECONDS);
                 }
             });
@@ -87,7 +94,6 @@ public abstract class NettyClient extends AbstractNetworkClient {
         }
         if (this.connection != null) {
             this.connection.getContext().channel().close().syncUninterruptibly();
-            NettyUtil.shutdownLoopGroups();
             this.connection = null;
         }
     }
