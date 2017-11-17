@@ -17,8 +17,18 @@ import java.util.concurrent.ThreadFactory;
  * Created by RINES on 17.11.17.
  */
 public class NettyUtil {
+    private static boolean bossIsWorker = true;
+    private static int bossThreads = 2;
+    private static int workerThreads = 0;
+    
     private static EventLoopGroup bossLoopGroup = null;
     private static EventLoopGroup workerLoopGroup = null;
+    
+    public static void setup(boolean bossIsWorker, int bossThreads, int workerThreads) {
+        NettyUtil.bossIsWorker = bossIsWorker;
+        NettyUtil.bossThreads = bossThreads;
+        NettyUtil.workerThreads = workerThreads;
+    }
     
     public static boolean isUsed() {
         return bossLoopGroup != null;
@@ -35,7 +45,7 @@ public class NettyUtil {
         }
     }
     
-    public synchronized static EventLoopGroup getBossLoopGroup(boolean bossIsWorker, int bossThreads) {
+    public synchronized static EventLoopGroup getBossLoopGroup() {
         if (bossLoopGroup == null) {
             ThreadFactory tf;
             if (bossIsWorker)
@@ -47,10 +57,10 @@ public class NettyUtil {
         return bossLoopGroup;
     }
     
-    public synchronized static EventLoopGroup getWorkerLoopGroup(boolean bossIsWorker, int workerThreads) {
+    public synchronized static EventLoopGroup getWorkerLoopGroup() {
         if (workerLoopGroup == null) {
             if (bossIsWorker) {
-                workerLoopGroup = bossLoopGroup;
+                workerLoopGroup = getBossLoopGroup();
             } else {
                 ThreadFactory tf = new NamedThreadFactory("Netty Worker Thread #", false);
                 workerLoopGroup = newEventLoopGroup(workerThreads, tf);

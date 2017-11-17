@@ -3,7 +3,6 @@ package org.inmine.network.netty.client;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
 import io.netty.util.concurrent.ScheduledFuture;
 
 import org.inmine.network.Packet;
@@ -34,10 +33,9 @@ public abstract class NettyClient extends AbstractNetworkClient {
     
     @Override
     public void connect(String address, int port) {
-        EventLoopGroup group = NettyUtil.getWorkerLoopGroup(false, 1);
         new Bootstrap()
             .channel(NettyUtil.getChannel())
-            .group(group)
+            .group(NettyUtil.getWorkerLoopGroup())
             .handler(new ClientChannelInitializer(this))
             .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
             .remoteAddress(address, port)
@@ -49,7 +47,7 @@ public abstract class NettyClient extends AbstractNetworkClient {
                     logger.log(Level.WARNING, "Could not connect to " + address + ":" + port, future.cause());
                 }
             });
-        callbackTickFuture = group.scheduleWithFixedDelay(this::callbackTick, 50L, 50L, TimeUnit.MILLISECONDS);
+        callbackTickFuture = NettyUtil.getWorkerLoopGroup().scheduleWithFixedDelay(this::callbackTick, 50L, 50L, TimeUnit.MILLISECONDS);
     }
     
     @Override

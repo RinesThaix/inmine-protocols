@@ -29,24 +29,13 @@ public abstract class NettyServer extends AbstractNetworkServer {
     private final PacketRegistry packetRegistry;
     private final Logger logger;
     
-    private final boolean bossIsWorker;
-    private final int bossThreads;
-    private final int workerThreads;
-    
     private final Map<SocketAddress, NettyConnection> connections = new ConcurrentHashMap<>();
     
     private ScheduledFuture<?> callbackTickFuture = null;
     
-    public NettyServer(Logger logger, boolean bossIsWorker, int bossThreads, int workerThreads, PacketRegistry packetRegistry) {
+    public NettyServer(Logger logger, PacketRegistry packetRegistry) {
         this.packetRegistry = packetRegistry;
         this.logger = logger;
-        this.bossIsWorker = bossIsWorker;
-        this.bossThreads = bossThreads;
-        this.workerThreads = workerThreads;
-    }
-    
-    public NettyServer(Logger logger, PacketRegistry packetRegistry) {
-        this(logger, false, 8, 8, packetRegistry);
     }
     
     private String address;
@@ -59,7 +48,7 @@ public abstract class NettyServer extends AbstractNetworkServer {
         this.address = address;
         this.port = port;
         ServerBootstrap b = new ServerBootstrap()
-            .group(NettyUtil.getBossLoopGroup(this.bossIsWorker, this.bossThreads), NettyUtil.getWorkerLoopGroup(this.bossIsWorker, this.workerThreads))
+            .group(NettyUtil.getBossLoopGroup(), NettyUtil.getWorkerLoopGroup())
             .channel(NettyUtil.getServerChannel())
             .childHandler(new ServerChannelInitializer(this));
         b.bind(address, port).addListener((ChannelFutureListener) future -> {
@@ -70,7 +59,7 @@ public abstract class NettyServer extends AbstractNetworkServer {
                 logger.log(Level.WARNING, "Could not bind to host " + address + ":" + port, future.cause());
             }
         });
-        callbackTickFuture = NettyUtil.getWorkerLoopGroup(this.bossIsWorker, this.workerThreads).scheduleWithFixedDelay(this::callbackTick, 50L, 50L, TimeUnit.MILLISECONDS);
+        callbackTickFuture = NettyUtil.getWorkerLoopGroup().scheduleWithFixedDelay(this::callbackTick, 50L, 50L, TimeUnit.MILLISECONDS);
     }
     
     @Override
