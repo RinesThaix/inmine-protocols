@@ -35,6 +35,13 @@ public class CallbackHandler {
         }
     }
 
+    protected void callCallbacksTimeouts() {
+        this.callbacks.values().forEach(cdata -> {
+            if (cdata.getOnTimeout() != null)
+                cdata.getOnTimeout().run();
+        });
+    }
+
     @SuppressWarnings("unchecked")
     public <T extends Packet> void onPacketPreReceived(T packet) {
         if (packet instanceof CallbackPacket) {

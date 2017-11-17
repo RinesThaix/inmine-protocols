@@ -1,12 +1,7 @@
 package org.inmine.network.callback;
 
 import org.inmine.network.NetworkClient;
-import org.inmine.network.Packet;
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 /**

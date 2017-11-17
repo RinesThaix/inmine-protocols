@@ -2,11 +2,9 @@ package org.inmine.network.netty;
 
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.Channel;
-import io.netty.handler.timeout.ReadTimeoutHandler;
 
 import org.inmine.network.PacketRegistry;
 
-import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 
@@ -32,8 +30,7 @@ public class ChannelInitializer<T extends Channel> extends io.netty.channel.Chan
     @Override
     protected void initChannel(T ch) throws Exception {
         ch.config().setAllocator(PooledByteBufAllocator.DEFAULT);
-        
-        ch.pipeline().addLast("timeout", new ReadTimeoutHandler(10, TimeUnit.MINUTES));
+
         ch.pipeline().addLast("packet-encoder", this.encoder);
         ch.pipeline().addLast("packet-decoder", new PacketDecoder(bufferPool, this.packetRegistry));
         HandlerBoss boss = new HandlerBoss(this.packetHandlerGenerator.get(), this.logger);

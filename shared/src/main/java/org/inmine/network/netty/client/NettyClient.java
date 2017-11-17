@@ -11,7 +11,9 @@ import org.inmine.network.Packet;
 import org.inmine.network.PacketRegistry;
 import org.inmine.network.callback.AbstractNetworkClient;
 import org.inmine.network.netty.NettyConnection;
+import org.inmine.network.netty.NettyPacketHandler;
 import org.inmine.network.netty.NettyUtil;
+import org.inmine.network.packet.Packet0KeepAlive;
 
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.TimeUnit;
@@ -31,6 +33,7 @@ public abstract class NettyClient extends AbstractNetworkClient {
     
     private ChannelFuture connectFuture;
     private ScheduledFuture<?> reconnectFuture;
+    private ScheduledFuture<?> keepAliveFuture;
     private Bootstrap bootstrap;
     private boolean shuttingDown;
     private boolean logReconnectMessage;
@@ -53,6 +56,22 @@ public abstract class NettyClient extends AbstractNetworkClient {
         }
         if (callbackTickFuture == null)
             this.callbackTickFuture = NettyUtil.getWorkerLoopGroup().scheduleWithFixedDelay(this::callbackTick, 50L, 50L, TimeUnit.MILLISECONDS);
+        if (keepAliveFuture == null)
+            this.keepAliveFuture = NettyUtil.getWorkerLoopGroup().scheduleWithFixedDelay(() -> {
+                if (this.connection == null)
+                    return;
+                long current = System.currentTimeMillis();
+                NettyPacketHandler handler = this.connection.getHandler();
+                if (current - handler.getLastPacketReceivedTime() > 40000L) {
+                    disconnect();
+                    this.shuttingDown = false;
+                    connect();
+                    return;
+                }
+                if (current - handler.getLastPacketSentTime() > 30000L) {
+                    sendPacket(new Packet0KeepAlive());
+                }
+            }, 1L, 1L, TimeUnit.SECONDS);
         bootstrap.remoteAddress(address, port);
         connect();
     }
@@ -92,6 +111,11 @@ public abstract class NettyClient extends AbstractNetworkClient {
             callbackTickFuture.cancel(false);
             callbackTickFuture = null;
         }
+        super.callCallbacksTimeouts();
+        if (keepAliveFuture != null) {
+            keepAliveFuture.cancel(false);
+            keepAliveFuture = null;
+        }
         if (this.connection != null) {
             this.connection.getContext().channel().close().syncUninterruptibly();
             this.connection = null;
@@ -112,6 +136,7 @@ public abstract class NettyClient extends AbstractNetworkClient {
     public void sendPacket(Packet packet) {
         if (this.connection == null)
             return;
+        this.connection.getHandler().packetSent();
         this.connection.getContext()
             .writeAndFlush(packet)
             .addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);

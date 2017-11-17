@@ -2,7 +2,6 @@ package org.inmine.network.netty.server;
 
 import io.netty.channel.ChannelHandlerContext;
 
-import org.inmine.network.Connection;
 import org.inmine.network.Packet;
 import org.inmine.network.netty.NettyPacketHandler;
 
@@ -19,7 +18,6 @@ public class NettyServerPacketHandler extends NettyPacketHandler {
     
     @Override
     public void handle(Packet packet) {
-        Connection connection = getConnection();
         this.server.onPacketPreReceived(packet);
         super.handle(packet);
     }

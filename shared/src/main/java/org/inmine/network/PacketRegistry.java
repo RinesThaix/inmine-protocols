@@ -1,5 +1,7 @@
 package org.inmine.network;
 
+import org.inmine.network.packet.Packet0KeepAlive;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -12,6 +14,7 @@ public class PacketRegistry {
     private final Map<Integer, Supplier<Packet>> constructors = new HashMap<>();
     
     public PacketRegistry(Supplier<Packet>... constructors) {
+        this.constructors.put(0, Packet0KeepAlive::new);
         for (Supplier<Packet> constructor : constructors) {
             Packet packet = constructor.get();
             this.constructors.put(packet.getId(), constructor);

@@ -11,7 +11,9 @@ import org.inmine.network.Packet;
 import org.inmine.network.PacketRegistry;
 import org.inmine.network.callback.AbstractNetworkServer;
 import org.inmine.network.netty.NettyConnection;
+import org.inmine.network.netty.NettyPacketHandler;
 import org.inmine.network.netty.NettyUtil;
+import org.inmine.network.packet.Packet0KeepAlive;
 
 import java.net.SocketAddress;
 import java.util.Collection;
@@ -32,6 +34,7 @@ public abstract class NettyServer extends AbstractNetworkServer {
     private final Map<SocketAddress, NettyConnection> connections = new ConcurrentHashMap<>();
     
     private ScheduledFuture<?> callbackTickFuture = null;
+    private ScheduledFuture<?> keepAliveFuture = null;
     
     public NettyServer(Logger logger, PacketRegistry packetRegistry) {
         this.packetRegistry = packetRegistry;
@@ -59,7 +62,22 @@ public abstract class NettyServer extends AbstractNetworkServer {
                 logger.log(Level.WARNING, "Could not bind to host " + address + ":" + port, future.cause());
             }
         });
-        callbackTickFuture = NettyUtil.getWorkerLoopGroup().scheduleWithFixedDelay(this::callbackTick, 50L, 50L, TimeUnit.MILLISECONDS);
+        if (callbackTickFuture == null)
+            callbackTickFuture = NettyUtil.getWorkerLoopGroup().scheduleWithFixedDelay(this::callbackTick, 50L, 50L, TimeUnit.MILLISECONDS);
+        if (keepAliveFuture == null)
+            this.keepAliveFuture = NettyUtil.getWorkerLoopGroup().scheduleWithFixedDelay(() -> {
+                long current = System.currentTimeMillis();
+                this.connections.values().forEach(connection -> {
+                    NettyPacketHandler handler = connection.getHandler();
+                    if (current - handler.getLastPacketReceivedTime() > 40000L) {
+                        connection.getContext().close();
+                        return;
+                    }
+                    if (current - handler.getLastPacketSentTime() > 30000L) {
+                        sendPacket(connection, new Packet0KeepAlive());
+                    }
+                });
+            }, 5L, 5L, TimeUnit.SECONDS);
     }
     
     @Override
@@ -68,6 +86,7 @@ public abstract class NettyServer extends AbstractNetworkServer {
             callbackTickFuture.cancel(false);
             callbackTickFuture = null;
         }
+        super.callCallbacksTimeouts();
         if (channel != null) {
             logger.info("Closing tcp listener");
             channel.close().syncUninterruptibly();
@@ -96,7 +115,9 @@ public abstract class NettyServer extends AbstractNetworkServer {
     
     @Override
     public void sendPacket(Connection connection, Packet packet) {
-        ((NettyConnection) connection).getContext()
+        NettyConnection ncon = (NettyConnection) connection;
+        ncon.getHandler().packetSent();
+        ncon.getContext()
             .writeAndFlush(packet)
             .addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
     }

@@ -25,7 +25,7 @@ public class NettyTester {
             public void onNewConnection(NettyConnection connection) {
                 logger.info("Server has just received the client!");
                 connection.getHandler().addHandler(PacketTest.class, p -> {
-                    if(!closed) {
+                    if (!closed) {
                         closed = true;
                         connection.getContext().close().syncUninterruptibly();
                         logger.info("DISCONNECTING");
@@ -40,7 +40,7 @@ public class NettyTester {
             
             @Override
             public void onDisconnecting(NettyConnection connection) {
-                if(++a < 2)
+                if (++a < 2)
                     return;
                 logger.info("Stopping the server..");
                 stop();

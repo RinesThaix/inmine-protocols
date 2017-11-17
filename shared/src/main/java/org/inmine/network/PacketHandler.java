@@ -13,12 +13,22 @@ public class PacketHandler {
     
     private final Map<Class<? extends Packet>, List<Consumer<Packet>>> handlers = new HashMap<>();
     private Connection connection;
+    private long lastPacketSentTime, lastPacketReceivedTime;
     
     public void handle(Packet packet) {
+        packetReceived();
         List<Consumer<Packet>> handlers = this.handlers.get(packet.getClass());
         if (handlers == null)
             return;
         handlers.forEach(handler -> handler.accept(packet));
+    }
+
+    public void packetReceived() {
+        this.lastPacketReceivedTime = System.currentTimeMillis();
+    }
+
+    public void packetSent() {
+        this.lastPacketSentTime = System.currentTimeMillis();
     }
     
     @SuppressWarnings("unchecked")
@@ -45,5 +55,12 @@ public class PacketHandler {
     public Connection getConnection() {
         return this.connection;
     }
-    
+
+    public long getLastPacketSentTime() {
+        return lastPacketSentTime;
+    }
+
+    public long getLastPacketReceivedTime() {
+        return lastPacketReceivedTime;
+    }
 }
