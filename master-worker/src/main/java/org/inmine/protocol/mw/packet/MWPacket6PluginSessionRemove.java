@@ -6,33 +6,35 @@ import org.inmine.network.Packet;
 import java.util.UUID;
 
 /**
- * @author xtrafrancyz
+ * Created by RINES on 21.11.17.
  */
-public class MWPacket3UserSessionRemove extends Packet {
-    public int userId;
+public class MWPacket6PluginSessionRemove extends Packet {
+
+    public int projectId;
     public UUID session;
 
-    public MWPacket3UserSessionRemove() { }
+    public MWPacket6PluginSessionRemove() { }
 
-    public MWPacket3UserSessionRemove(int userId, UUID session) {
-        this.userId = userId;
+    public MWPacket6PluginSessionRemove(int projectId, UUID session) {
+        this.projectId = projectId;
         this.session = session;
     }
 
     @Override
     public int getId() {
-        return 3;
+        return 6;
     }
 
     @Override
     public void write(Buffer buffer) {
-        buffer.writeInt(this.userId);
+        buffer.writeVarInt(this.projectId);
         buffer.writeUUID(this.session);
     }
 
     @Override
     public void read(Buffer buffer) {
-        this.userId = buffer.readInt();
+        this.projectId = buffer.readVarInt();
         this.session = buffer.readUUID();
     }
+
 }

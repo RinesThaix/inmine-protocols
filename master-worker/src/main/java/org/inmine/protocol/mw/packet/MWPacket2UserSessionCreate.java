@@ -27,13 +27,12 @@ public class MWPacket2UserSessionCreate extends Packet {
     @Override
     public void write(Buffer buffer) {
         buffer.writeInt(this.userId);
-        buffer.writeLong(this.session.getMostSignificantBits());
-        buffer.writeLong(this.session.getLeastSignificantBits());
+        buffer.writeUUID(this.session);
     }
 
     @Override
     public void read(Buffer buffer) {
         this.userId = buffer.readInt();
-        this.session = new UUID(buffer.readLong(), buffer.readLong());
+        this.session = buffer.readUUID();
     }
 }

@@ -31,7 +31,7 @@ public interface NetworkClient {
         sendPacket(packet, callback, timeout, null);
     }
     
-    default <T extends CallbackPacket> void sendPacket(T packet, Consumer<CallbackPacket> callback, long timeout, Runnable onTimeout){
+    default <T extends CallbackPacket> void sendPacket(T packet, Consumer<CallbackPacket> callback, long timeout, Runnable onTimeout) {
         Connection conn = getConnection();
         if (conn != null)
             conn.sendPacket(packet, callback, timeout, onTimeout);
