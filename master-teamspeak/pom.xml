@@ -2,29 +2,27 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <groupId>org.inmine.protocol</groupId>
-    <name>master-teamspeak</name>
-    <artifactId>${name}</artifactId>
-    <version>1.0</version>
     <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.inmine.protocol</groupId>
+    <name>Master-Teamspeak Protocol</name>
+    <artifactId>master-teamspeak</artifactId>
+    <version>1.0</version>
+
     <dependencies>
-        <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-all</artifactId>
-            <version>4.1.16.Final</version>
-            <scope>compile</scope>
-        </dependency>
         <dependency>
             <groupId>org.inmine.protocol</groupId>
             <artifactId>shared</artifactId>
             <version>1.0</version>
         </dependency>
     </dependencies>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
+
     <build>
         <plugins>
             <plugin>
@@ -49,7 +47,7 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
-                            <finalName>${name}</finalName>
+                            <finalName>${project.artifactId}</finalName>
                             <relocations>
                             </relocations>
                         </configuration>
