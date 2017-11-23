@@ -10,14 +10,14 @@ import org.inmine.protocol.wp.ServerType;
 public class PPacket1Connect extends Packet {
 
     public ServerType serverType;
-    public int projectId;
+    public int subProtocol;
     public String secretKey;
 
     public PPacket1Connect() { }
 
-    public PPacket1Connect(ServerType serverType, int projectId, String secretKey) {
+    public PPacket1Connect(ServerType serverType, int subProtocol, String secretKey) {
         this.serverType = serverType;
-        this.projectId = projectId;
+        this.subProtocol = subProtocol;
         this.secretKey = secretKey;
     }
 
@@ -29,14 +29,14 @@ public class PPacket1Connect extends Packet {
     @Override
     public void write(Buffer buffer) {
         buffer.writeEnum(this.serverType);
-        buffer.writeVarInt(this.projectId);
+        buffer.writeVarInt(this.subProtocol);
         buffer.writeString(this.secretKey);
     }
 
     @Override
     public void read(Buffer buffer) {
         this.serverType = buffer.readEnum(ServerType.class);
-        this.projectId = buffer.readVarInt();
+        this.subProtocol = buffer.readVarInt();
         this.secretKey = buffer.readString(64);
     }
 }

@@ -52,7 +52,6 @@ public class PPacket2ConnectionResponse extends Packet {
 
     public enum Status {
         OK,
-        UNKNOWN_PROJECT_ID,
         INVALID_SECRET_KEY
     }
 
