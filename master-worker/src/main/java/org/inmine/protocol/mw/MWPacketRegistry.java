@@ -20,7 +20,8 @@ public class MWPacketRegistry extends PacketRegistry {
             MWPacket8ProjectSecretKeyChanged::new,
             MWPacket9UserSessionToPluginSession::new,
             MWPacket10UserIngameConnection::new,
-            MWPacket11AwaitPlayerOnPlugin::new
+            MWPacket11AwaitPlayerOnPlugin::new,
+            MWPacket12UserIngameConnectionResponse::new
         );
     }
 }

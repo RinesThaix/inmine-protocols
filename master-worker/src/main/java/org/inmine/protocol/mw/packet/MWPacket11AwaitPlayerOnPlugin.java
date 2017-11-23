@@ -10,16 +10,16 @@ import java.util.UUID;
  */
 public class MWPacket11AwaitPlayerOnPlugin extends Packet {
 
-    public int projectId;
     public UUID pluginSession;
+    public UUID userSession;
     public String address;
     public String nickname;
 
     public MWPacket11AwaitPlayerOnPlugin() { }
 
-    public MWPacket11AwaitPlayerOnPlugin(int projectId, UUID pluginSession, String address, String nickname) {
-        this.projectId = projectId;
+    public MWPacket11AwaitPlayerOnPlugin(UUID pluginSession, UUID userSession, String address, String nickname) {
         this.pluginSession = pluginSession;
+        this.userSession = userSession;
         this.address = address;
         this.nickname = nickname;
     }
@@ -31,16 +31,16 @@ public class MWPacket11AwaitPlayerOnPlugin extends Packet {
 
     @Override
     public void write(Buffer buffer) {
-        buffer.writeVarInt(this.projectId);
         buffer.writeUUID(this.pluginSession);
+        buffer.writeUUID(this.userSession);
         buffer.writeString(this.address);
         buffer.writeStringNullable(this.nickname);
     }
 
     @Override
     public void read(Buffer buffer) {
-        this.projectId = buffer.readVarInt();
         this.pluginSession = buffer.readUUID();
+        this.userSession = buffer.readUUID();
         this.address = buffer.readString(16);
         this.nickname = buffer.readStringNullable(16);
     }
