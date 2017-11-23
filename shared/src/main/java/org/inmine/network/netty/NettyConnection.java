@@ -8,6 +8,7 @@ import org.inmine.network.Packet;
 import org.inmine.network.callback.CallbackHandler;
 import org.inmine.network.callback.CallbackPacket;
 
+import java.net.InetSocketAddress;
 import java.util.function.Consumer;
 
 /**
@@ -36,18 +37,24 @@ public class NettyConnection implements Connection {
     
     @Override
     public void sendPacket(Packet packet) {
-        handler.packetSent();
-        context.writeAndFlush(packet).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
+        this.handler.packetSent();
+        this.context.writeAndFlush(packet).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
     }
     
     @Override
     public <T extends CallbackPacket> void sendPacket(T packet, Consumer<CallbackPacket> callback, long timeout, Runnable onTimeout) {
-        parent.registerCallback(packet, callback, timeout, onTimeout);
+        this.parent.registerCallback(packet, callback, timeout, onTimeout);
         sendPacket(packet);
     }
     
     @Override
     public void disconnect() {
-        context.channel().close();
+        this.context.channel().close();
     }
+
+    @Override
+    public InetSocketAddress getRemoteAddress() {
+        return (InetSocketAddress) this.context.channel().remoteAddress();
+    }
+
 }
