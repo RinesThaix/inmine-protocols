@@ -1,14 +1,7 @@
 package org.inmine.protocol.mw;
 
 import org.inmine.network.PacketRegistry;
-import org.inmine.protocol.mw.packet.MWPacket1Connect;
-import org.inmine.protocol.mw.packet.MWPacket2UserSessionCreate;
-import org.inmine.protocol.mw.packet.MWPacket3UserSessionRemove;
-import org.inmine.protocol.mw.packet.MWPacket4UserNameChanged;
-import org.inmine.protocol.mw.packet.MWPacket5PluginSessionCreate;
-import org.inmine.protocol.mw.packet.MWPacket6PluginSessionRemove;
-import org.inmine.protocol.mw.packet.MWPacket7ProjectNameChanged;
-import org.inmine.protocol.mw.packet.MWPacket8ProjectSecretKeyChanged;
+import org.inmine.protocol.mw.packet.*;
 
 /**
  * @author xtrafrancyz
@@ -24,7 +17,10 @@ public class MWPacketRegistry extends PacketRegistry {
             MWPacket5PluginSessionCreate::new,
             MWPacket6PluginSessionRemove::new,
             MWPacket7ProjectNameChanged::new,
-            MWPacket8ProjectSecretKeyChanged::new
+            MWPacket8ProjectSecretKeyChanged::new,
+            MWPacket9UserSessionToPluginSession::new,
+            MWPacket10UserIngameConnection::new,
+            MWPacket11AwaitPlayerOnPlugin::new
         );
     }
 }
