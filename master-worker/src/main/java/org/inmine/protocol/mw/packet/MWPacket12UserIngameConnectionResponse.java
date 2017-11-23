@@ -36,8 +36,6 @@ public class MWPacket12UserIngameConnectionResponse extends Packet {
         if (this.status == Status.OK) {
             buffer.writeUUID(this.pluginSession);
             buffer.writeString(this.nickname);
-        } else if (this.status == Status.REQUIRES_APPROVAL) {
-            buffer.writeUUID(this.pluginSession);
         }
     }
 
@@ -48,8 +46,6 @@ public class MWPacket12UserIngameConnectionResponse extends Packet {
         if (this.status == Status.OK) {
             this.pluginSession = buffer.readUUID();
             this.nickname = buffer.readString(16);
-        } else if (this.status == Status.REQUIRES_APPROVAL) {
-            this.pluginSession = buffer.readUUID();
         }
     }
 

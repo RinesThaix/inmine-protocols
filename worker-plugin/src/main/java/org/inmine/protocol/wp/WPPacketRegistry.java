@@ -8,6 +8,7 @@ import org.inmine.protocol.wp.packet.PPacket4AwaitPlayer;
 import org.inmine.protocol.wp.packet.PPacket5PlayerAwaitingResponse;
 import org.inmine.protocol.wp.packet.PPacket6RegisterPlayer;
 import org.inmine.protocol.wp.packet.PPacket7UnregisterPlayer;
+import org.inmine.protocol.wp.packet.PPacket8PlayerSecretKey;
 
 /**
  * Created by RINES on 21.11.17.
@@ -23,7 +24,8 @@ public class WPPacketRegistry extends PacketRegistry {
             PPacket4AwaitPlayer::new,
             PPacket5PlayerAwaitingResponse::new,
             PPacket6RegisterPlayer::new,
-            PPacket7UnregisterPlayer::new
+            PPacket7UnregisterPlayer::new,
+            PPacket8PlayerSecretKey::new
         );
     }
 

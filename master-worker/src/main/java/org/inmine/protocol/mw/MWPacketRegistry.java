@@ -21,7 +21,9 @@ public class MWPacketRegistry extends PacketRegistry {
             MWPacket9UserSessionToPluginSession::new,
             MWPacket10UserIngameConnection::new,
             MWPacket11AwaitPlayerOnPlugin::new,
-            MWPacket12UserIngameConnectionResponse::new
+            MWPacket12UserIngameConnectionResponse::new,
+            MWPacket13UserIngameConnectionNotification::new,
+            MWPacket14UserSecretKey::new
         );
     }
 }
