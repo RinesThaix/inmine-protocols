@@ -5,24 +5,14 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.inmine.protocol</groupId>
-    <name>Master-Worker Protocol</name>
-    <artifactId>master-worker</artifactId>
+    <name>Worker-Client Protocol</name>
+    <artifactId>worker-client</artifactId>
     <version>1.0</version>
 
     <dependencies>
         <dependency>
             <groupId>org.inmine.protocol</groupId>
             <artifactId>shared</artifactId>
-            <version>1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.inmine.protocol</groupId>
-            <artifactId>worker-plugin</artifactId>
-            <version>1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.inmine.protocol</groupId>
-            <artifactId>worker-client</artifactId>
             <version>1.0</version>
         </dependency>
     </dependencies>
@@ -57,7 +47,7 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
-                            <finalName>${project.artifactId}</finalName>
+                            <finalName>${name}</finalName>
                             <relocations>
                             </relocations>
                         </configuration>

@@ -1,12 +1,12 @@
-package org.inmine.protocol.mw.packet;
+package org.inmine.protocol.wc.packet;
 
 import org.inmine.network.Buffer;
 import org.inmine.network.Packet;
 
 /**
- * Created by RINES on 19.11.17.
+ * Created by RINES on 18.11.17.
  */
-public class MWPacket4UserNameChanged extends Packet {
+public class CPacket4ChangeName extends Packet {
 
     public int userId;
     public String name;

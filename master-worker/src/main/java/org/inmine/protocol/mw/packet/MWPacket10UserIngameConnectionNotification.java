@@ -8,17 +8,17 @@ import java.util.UUID;
 /**
  * Created by RINES on 23.11.17.
  */
-public class MWPacket13UserIngameConnectionNotification extends Packet {
+public class MWPacket10UserIngameConnectionNotification extends Packet {
 
     public UUID userSession;
     public Status status;
     public String secretKey;
     public String nickname;
-    public MWPacket12UserIngameConnectionResponse.Status error;
+    public MWPacket9UserIngameConnectionResponse.Status error;
 
-    public MWPacket13UserIngameConnectionNotification() { }
+    public MWPacket10UserIngameConnectionNotification() { }
 
-    public MWPacket13UserIngameConnectionNotification(UUID userSession, Status status, String secretKey, String nickname, MWPacket12UserIngameConnectionResponse.Status error) {
+    public MWPacket10UserIngameConnectionNotification(UUID userSession, Status status, String secretKey, String nickname, MWPacket9UserIngameConnectionResponse.Status error) {
         this.userSession = userSession;
         this.status = status;
         this.secretKey = secretKey;
@@ -28,7 +28,7 @@ public class MWPacket13UserIngameConnectionNotification extends Packet {
 
     @Override
     public int getId() {
-        return 13;
+        return 12;
     }
 
     @Override
@@ -52,7 +52,7 @@ public class MWPacket13UserIngameConnectionNotification extends Packet {
         else if (this.status == Status.ENTER_APPROVAL_KEY)
             this.secretKey = buffer.readString(16);
         else if (this.status == Status.ERROR)
-            this.error = buffer.readEnum(MWPacket12UserIngameConnectionResponse.Status.class);
+            this.error = buffer.readEnum(MWPacket9UserIngameConnectionResponse.Status.class);
     }
 
     public enum Status {

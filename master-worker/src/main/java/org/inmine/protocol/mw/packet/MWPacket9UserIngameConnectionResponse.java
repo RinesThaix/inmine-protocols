@@ -8,16 +8,16 @@ import java.util.UUID;
 /**
  * Created by RINES on 23.11.17.
  */
-public class MWPacket12UserIngameConnectionResponse extends Packet {
+public class MWPacket9UserIngameConnectionResponse extends Packet {
 
     public UUID userSession;
     public Status status;
     public UUID pluginSession;
     public String nickname;
 
-    public MWPacket12UserIngameConnectionResponse() { }
+    public MWPacket9UserIngameConnectionResponse() { }
 
-    public MWPacket12UserIngameConnectionResponse(UUID userSession, Status status, UUID pluginSession, String nickname) {
+    public MWPacket9UserIngameConnectionResponse(UUID userSession, Status status, UUID pluginSession, String nickname) {
         this.userSession = userSession;
         this.status = status;
         this.pluginSession = pluginSession;
@@ -26,7 +26,7 @@ public class MWPacket12UserIngameConnectionResponse extends Packet {
 
     @Override
     public int getId() {
-        return 12;
+        return 11;
     }
 
     @Override

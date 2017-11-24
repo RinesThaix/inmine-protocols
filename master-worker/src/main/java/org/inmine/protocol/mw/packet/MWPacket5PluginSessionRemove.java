@@ -3,35 +3,38 @@ package org.inmine.protocol.mw.packet;
 import org.inmine.network.Buffer;
 import org.inmine.network.Packet;
 
+import java.util.UUID;
+
 /**
  * Created by RINES on 21.11.17.
  */
-public class MWPacket8ProjectSecretKeyChanged extends Packet {
+public class MWPacket5PluginSessionRemove extends Packet {
 
     public int projectId;
-    public String secretKey;
+    public UUID session;
 
-    public MWPacket8ProjectSecretKeyChanged() { }
+    public MWPacket5PluginSessionRemove() { }
 
-    public MWPacket8ProjectSecretKeyChanged(int projectId, String secretKey) {
+    public MWPacket5PluginSessionRemove(int projectId, UUID session) {
         this.projectId = projectId;
-        this.secretKey = secretKey;
+        this.session = session;
     }
 
     @Override
     public int getId() {
-        return 8;
+        return 6;
     }
 
     @Override
     public void write(Buffer buffer) {
         buffer.writeVarInt(this.projectId);
-        buffer.writeString(this.secretKey);
+        buffer.writeUUID(this.session);
     }
 
     @Override
     public void read(Buffer buffer) {
         this.projectId = buffer.readVarInt();
-        this.secretKey = buffer.readString(64);
+        this.session = buffer.readUUID();
     }
+
 }

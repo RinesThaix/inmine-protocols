@@ -2,28 +2,48 @@ package org.inmine.protocol.mw;
 
 import org.inmine.network.PacketRegistry;
 import org.inmine.protocol.mw.packet.*;
+import org.inmine.protocol.wc.WCPacketRegistry;
+import org.inmine.protocol.wp.WPPacketRegistry;
 
 /**
  * @author xtrafrancyz
  */
 public class MWPacketRegistry extends PacketRegistry {
+
+    private static MWPacketRegistry instance;
+
+    private final WPPacketRegistry pluginPacketRegistry = new WPPacketRegistry();
+    private final WCPacketRegistry clientPacketRegistry = new WCPacketRegistry();
+
     @SuppressWarnings("unchecked")
     public MWPacketRegistry() {
         super(1,
             MWPacket1Connect::new,
             MWPacket2UserSessionCreate::new,
             MWPacket3UserSessionRemove::new,
-            MWPacket4UserNameChanged::new,
-            MWPacket5PluginSessionCreate::new,
-            MWPacket6PluginSessionRemove::new,
-            MWPacket7ProjectNameChanged::new,
-            MWPacket8ProjectSecretKeyChanged::new,
-            MWPacket9UserSessionToPluginSession::new,
-            MWPacket10UserIngameConnection::new,
-            MWPacket11AwaitPlayerOnPlugin::new,
-            MWPacket12UserIngameConnectionResponse::new,
-            MWPacket13UserIngameConnectionNotification::new,
-            MWPacket14UserSecretKey::new
+            MWPacket4PluginSessionCreate::new,
+            MWPacket5PluginSessionRemove::new,
+            MWPacket6ProjectSecretKeyChanged::new,
+            MWPacket7UserIngameConnection::new,
+            MWPacket8AwaitPlayerOnPlugin::new,
+            MWPacket9UserIngameConnectionResponse::new,
+            MWPacket10UserIngameConnectionNotification::new,
+            MWPacket11ProxyPluginPacket::new,
+            MWPacket12ProxyClientPacket::new
         );
+        instance = this;
     }
+
+    public WPPacketRegistry getPluginPacketRegistry() {
+        return this.pluginPacketRegistry;
+    }
+
+    public WCPacketRegistry getClientPacketRegistry() {
+        return this.clientPacketRegistry;
+    }
+
+    public static MWPacketRegistry instance() {
+        return instance();
+    }
+
 }

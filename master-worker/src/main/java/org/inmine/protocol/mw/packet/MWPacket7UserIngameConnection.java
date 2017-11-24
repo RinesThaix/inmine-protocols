@@ -8,41 +8,32 @@ import java.util.UUID;
 /**
  * Created by RINES on 23.11.17.
  */
-public class MWPacket11AwaitPlayerOnPlugin extends Packet {
+public class MWPacket7UserIngameConnection extends Packet {
 
-    public UUID pluginSession;
     public UUID userSession;
     public String address;
-    public String nickname;
 
-    public MWPacket11AwaitPlayerOnPlugin() { }
+    public MWPacket7UserIngameConnection() { }
 
-    public MWPacket11AwaitPlayerOnPlugin(UUID pluginSession, UUID userSession, String address, String nickname) {
-        this.pluginSession = pluginSession;
+    public MWPacket7UserIngameConnection(UUID userSession, String address) {
         this.userSession = userSession;
         this.address = address;
-        this.nickname = nickname;
     }
 
     @Override
     public int getId() {
-        return 11;
+        return 9;
     }
 
     @Override
     public void write(Buffer buffer) {
-        buffer.writeUUID(this.pluginSession);
         buffer.writeUUID(this.userSession);
         buffer.writeString(this.address);
-        buffer.writeStringNullable(this.nickname);
     }
 
     @Override
     public void read(Buffer buffer) {
-        this.pluginSession = buffer.readUUID();
         this.userSession = buffer.readUUID();
         this.address = buffer.readString(50);
-        this.nickname = buffer.readStringNullable(16);
     }
-
 }
