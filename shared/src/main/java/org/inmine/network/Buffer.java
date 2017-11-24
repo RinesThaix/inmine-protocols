@@ -307,4 +307,19 @@ public abstract class Buffer {
         writeLong(uuid.getLeastSignificantBits());
     }
 
+    public UUID readUUIDNullable() {
+        if(readBoolean())
+            return readUUID();
+        return null;
+    }
+
+    public void writeUUIDNullable(UUID uuid) {
+        if(uuid != null) {
+            writeBoolean(true);
+            writeUUID(uuid);
+        }else {
+            writeBoolean(false);
+        }
+    }
+
 }

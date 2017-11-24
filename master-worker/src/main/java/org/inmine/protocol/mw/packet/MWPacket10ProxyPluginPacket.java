@@ -30,14 +30,14 @@ public class MWPacket10ProxyPluginPacket extends Packet implements ProxyPacket {
 
     @Override
     public void write(Buffer buffer) {
-        buffer.writeUUID(this.session);
+        buffer.writeUUIDNullable(this.session);
         buffer.writeVarInt(this.packet.getId());
         this.packet.write(buffer);
     }
 
     @Override
     public void read(Buffer buffer) {
-        this.session = buffer.readUUID();
+        this.session = buffer.readUUIDNullable();
         this.packet = getRegistry().constructPacket(buffer.readVarInt());
         this.packet.read(buffer);
     }
