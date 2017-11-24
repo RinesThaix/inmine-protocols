@@ -26,25 +26,25 @@ import java.util.logging.Logger;
  * Created by RINES on 17.11.17.
  */
 public abstract class NettyClient extends CallbackHandler implements NetworkClient {
-    
+
     private final PacketRegistry packetRegistry;
     private final Logger logger;
-    
+
     private ScheduledFuture<?> callbackTickFuture = null;
     private NettyConnection connection;
-    
+
     private ChannelFuture connectFuture;
     private ScheduledFuture<?> reconnectFuture;
     private ScheduledFuture<?> keepAliveFuture;
     private Bootstrap bootstrap;
     private boolean shuttingDown;
     private boolean logReconnectMessage;
-    
+
     public NettyClient(Logger logger, PacketRegistry packetRegistry) {
         this.packetRegistry = packetRegistry;
         this.logger = logger;
     }
-    
+
     @Override
     public void connect(String address, int port) {
         this.shuttingDown = false;
@@ -77,7 +77,7 @@ public abstract class NettyClient extends CallbackHandler implements NetworkClie
         bootstrap.remoteAddress(address, port);
         connect();
     }
-    
+
     private void connect() {
         reconnectFuture = null;
         connectFuture = this.bootstrap
@@ -97,7 +97,7 @@ public abstract class NettyClient extends CallbackHandler implements NetworkClie
                 }
             });
     }
-    
+
     @Override
     public void disconnect() {
         this.shuttingDown = true;
@@ -123,28 +123,33 @@ public abstract class NettyClient extends CallbackHandler implements NetworkClie
             this.connection = null;
         }
     }
-    
+
+    @Override
+    public boolean isConnected() {
+        return this.connection != null;
+    }
+
     @Override
     public PacketRegistry getPacketRegistry() {
         return this.packetRegistry;
     }
-    
+
     @Override
     public NettyConnection getConnection() {
         return this.connection;
     }
-    
+
     @Override
     public void sendPacket(Packet packet) {
         if (this.connection == null)
             return;
         this.connection.sendPacket(packet);
     }
-    
+
     public Logger getLogger() {
         return this.logger;
     }
-    
+
     NettyConnection createConnection(ChannelHandlerContext ctx, NettyClientPacketHandler handler) {
         this.connection = new NettyConnection(this, ctx, handler);
         try {
@@ -155,7 +160,7 @@ public abstract class NettyClient extends CallbackHandler implements NetworkClie
         }
         return this.connection;
     }
-    
+
     void deleteConnection(ChannelHandlerContext ctx) {
         this.connection.getHandler().setConnection(null);
         this.connection = null;
@@ -167,5 +172,5 @@ public abstract class NettyClient extends CallbackHandler implements NetworkClie
         if (!this.shuttingDown)
             connect();
     }
-    
+
 }

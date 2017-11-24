@@ -12,6 +12,8 @@ public interface NetworkClient {
     void connect(String address, int port);
     
     void disconnect();
+
+    boolean isConnected();
     
     PacketRegistry getPacketRegistry();
     

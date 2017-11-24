@@ -41,7 +41,7 @@ public class MWPacket11AwaitPlayerOnPlugin extends Packet {
     public void read(Buffer buffer) {
         this.pluginSession = buffer.readUUID();
         this.userSession = buffer.readUUID();
-        this.address = buffer.readString(16);
+        this.address = buffer.readString(50);
         this.nickname = buffer.readStringNullable(16);
     }
 
