@@ -22,7 +22,7 @@ public class MWPacket5PluginSessionRemove extends Packet {
 
     @Override
     public int getId() {
-        return 6;
+        return 5;
     }
 
     @Override

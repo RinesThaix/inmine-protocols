@@ -26,7 +26,7 @@ public class MWPacket9UserIngameConnectionResponse extends Packet {
 
     @Override
     public int getId() {
-        return 11;
+        return 9;
     }
 
     @Override

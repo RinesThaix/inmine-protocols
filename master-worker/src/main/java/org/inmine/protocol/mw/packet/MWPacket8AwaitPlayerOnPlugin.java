@@ -26,7 +26,7 @@ public class MWPacket8AwaitPlayerOnPlugin extends Packet {
 
     @Override
     public int getId() {
-        return 10;
+        return 8;
     }
 
     @Override

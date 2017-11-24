@@ -20,7 +20,7 @@ public class MWPacket6ProjectSecretKeyChanged extends Packet {
 
     @Override
     public int getId() {
-        return 8;
+        return 6;
     }
 
     @Override

@@ -22,7 +22,7 @@ public class MWPacket7UserIngameConnection extends Packet {
 
     @Override
     public int getId() {
-        return 9;
+        return 7;
     }
 
     @Override

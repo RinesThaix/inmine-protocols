@@ -11,21 +11,21 @@ import java.util.UUID;
 /**
  * Created by RINES on 24.11.17.
  */
-public class MWPacket12ProxyClientPacket extends Packet implements ProxyPacket {
+public class MWPacket10ProxyPluginPacket extends Packet implements ProxyPacket {
 
     public UUID session;
     public Packet packet;
 
-    public MWPacket12ProxyClientPacket() { }
+    public MWPacket10ProxyPluginPacket() { }
 
-    public MWPacket12ProxyClientPacket(UUID session, Packet packet) {
+    public MWPacket10ProxyPluginPacket(UUID session, Packet packet) {
         this.session = session;
         this.packet = packet;
     }
 
     @Override
     public int getId() {
-        return 15;
+        return 10;
     }
 
     @Override
@@ -43,7 +43,7 @@ public class MWPacket12ProxyClientPacket extends Packet implements ProxyPacket {
     }
 
     private static PacketRegistry getRegistry() {
-        return MWPacketRegistry.instance().getClientPacketRegistry();
+        return MWPacketRegistry.instance().getPluginPacketRegistry();
     }
 
     @Override

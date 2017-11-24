@@ -25,7 +25,7 @@ public class MWPacket4PluginSessionCreate extends Packet {
 
     @Override
     public int getId() {
-        return 5;
+        return 4;
     }
 
     @Override

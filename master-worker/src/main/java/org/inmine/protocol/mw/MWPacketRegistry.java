@@ -27,9 +27,8 @@ public class MWPacketRegistry extends PacketRegistry {
             MWPacket7UserIngameConnection::new,
             MWPacket8AwaitPlayerOnPlugin::new,
             MWPacket9UserIngameConnectionResponse::new,
-            MWPacket10UserIngameConnectionNotification::new,
-            MWPacket11ProxyPluginPacket::new,
-            MWPacket12ProxyClientPacket::new
+            MWPacket10ProxyPluginPacket::new,
+            MWPacket11ProxyClientPacket::new
         );
         instance = this;
     }
