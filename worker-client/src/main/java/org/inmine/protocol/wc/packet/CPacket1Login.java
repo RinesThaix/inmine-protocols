@@ -11,6 +11,13 @@ public class CPacket1Login extends Packet {
     public String email;
     public String password;
 
+    public CPacket1Login() { }
+
+    public CPacket1Login(String email, String password) {
+        this.email = email;
+        this.password = password;
+    }
+
     @Override
     public int getId() {
         return 1;
