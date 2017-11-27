@@ -6,9 +6,9 @@ import org.inmine.network.netty.NettyUtil;
 import org.inmine.network.netty.client.NettyClient;
 import org.inmine.network.netty.server.NettyServer;
 import org.inmine.network.packet.SPacketDisconnect;
-import org.inmine.util.OwnLogger;
 
 import java.util.Random;
+import java.util.logging.Logger;
 
 /**
  * Created by RINES on 17.11.17.
@@ -16,7 +16,7 @@ import java.util.Random;
 public class NettyTester {
     
     public static void main(String[] args) {
-        OwnLogger logger = new OwnLogger("test");
+        Logger logger = Logger.getLogger("test");
         TestPacketRegistry registry = new TestPacketRegistry();
         NettyServer server = new NettyServer(logger, registry) {
             

@@ -42,5 +42,9 @@ public interface NetworkClient {
     void onConnected();
     
     void onDisconnected();
+
+    void setPacketReceivedListener(Consumer<Packet> listener);
+
+    void setPacketSentListener(Consumer<Packet> listener);
     
 }

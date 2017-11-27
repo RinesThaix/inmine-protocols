@@ -13,8 +13,13 @@ public class PacketHandler {
     
     private final Map<Class<? extends Packet>, List<Consumer<Packet>>> handlers = new HashMap<>();
     protected Connection connection;
-    private long lastPacketSentTime, lastPacketReceivedTime;
-    
+    private long lastPacketSentTime;
+    private long lastPacketReceivedTime;
+
+    public PacketHandler() {
+        this.lastPacketSentTime = this.lastPacketReceivedTime = System.currentTimeMillis();
+    }
+
     public void handle(Packet packet) {
         packetReceived();
         List<Consumer<Packet>> handlers = this.handlers.get(packet.getClass());
@@ -26,8 +31,8 @@ public class PacketHandler {
     public void packetReceived() {
         this.lastPacketReceivedTime = System.currentTimeMillis();
     }
-    
-    public void packetSent() {
+
+    public void packetSent(Packet packet) {
         this.lastPacketSentTime = System.currentTimeMillis();
     }
     

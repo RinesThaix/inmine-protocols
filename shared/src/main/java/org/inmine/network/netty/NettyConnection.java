@@ -37,7 +37,7 @@ public class NettyConnection implements Connection {
     
     @Override
     public void sendPacket(Packet packet) {
-        this.handler.packetSent();
+        this.handler.packetSent(packet);
         this.context.writeAndFlush(packet).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
     }
     

@@ -19,6 +19,7 @@ import org.inmine.network.packet.SPacketKeepAlive;
 
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -39,6 +40,8 @@ public abstract class NettyClient extends CallbackHandler implements NetworkClie
     private Bootstrap bootstrap;
     private boolean shuttingDown;
     private boolean logReconnectMessage;
+    Consumer<Packet> packetReceivedListener;
+    Consumer<Packet> packetSentListener;
 
     public NettyClient(Logger logger, PacketRegistry packetRegistry) {
         this.packetRegistry = packetRegistry;
@@ -146,6 +149,16 @@ public abstract class NettyClient extends CallbackHandler implements NetworkClie
         this.connection.sendPacket(packet);
     }
 
+    @Override
+    public void setPacketReceivedListener(Consumer<Packet> listener) {
+        packetReceivedListener = listener;
+    }
+
+    @Override
+    public void setPacketSentListener(Consumer<Packet> listener) {
+        packetSentListener = listener;
+    }
+
     public Logger getLogger() {
         return this.logger;
     }
@@ -154,7 +167,6 @@ public abstract class NettyClient extends CallbackHandler implements NetworkClie
         this.connection = new NettyConnection(this, ctx, handler);
         try {
             sendPacket(new SPacketHandshake(getPacketRegistry().getVersion()));
-            onConnected();
         } catch (Exception ex) {
             new Exception("Can not process connection callback", ex).printStackTrace();
         }
