@@ -10,7 +10,7 @@ import java.util.UUID;
  */
 public class CPacket2LoginResponse extends Packet {
 
-    public Status status;
+    public boolean success;
     public int userId;
     public UUID session;
 
@@ -23,8 +23,8 @@ public class CPacket2LoginResponse extends Packet {
 
     @Override
     public void write(Buffer buffer) {
-        buffer.writeEnum(this.status);
-        if (this.status == Status.OK) {
+        buffer.writeBoolean(this.success);
+        if (this.success) {
             buffer.writeInt(this.userId);
             buffer.writeUUID(this.session);
         }
@@ -32,16 +32,10 @@ public class CPacket2LoginResponse extends Packet {
 
     @Override
     public void read(Buffer buffer) {
-        this.status = buffer.readEnum(Status.class);
-        if (this.status == Status.OK) {
+        this.success = buffer.readBoolean();
+        if (this.success) {
             this.userId = buffer.readInt();
             this.session = buffer.readUUID();
         }
-    }
-
-    public enum Status {
-        OK,
-        INVALID_CREDENTIALS,
-        ACCOUNT_DOESNT_EXIST
     }
 }
