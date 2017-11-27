@@ -1,7 +1,5 @@
 package org.inmine.network;
 
-import org.inmine.network.packet.ProxyPacket;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,9 +30,7 @@ public abstract class PacketProcessor {
             this.handlers.computeIfAbsent(packet, list -> new ArrayList<>()).add((BiConsumer<UUID, Packet>) handler);
         }
 
-        public void handle(ProxyPacket proxied) {
-            Packet packet = proxied.getPacket();
-            UUID session = proxied.getSession();
+        public void handle(UUID session, Packet packet) {
             List<BiConsumer<UUID, Packet>> handlers = this.handlers.get(packet.getClass());
             if (handlers == null)
                 return;

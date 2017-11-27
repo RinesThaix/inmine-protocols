@@ -7,15 +7,17 @@ import java.util.LinkedList;
 /**
  * @author xtrafrancyz
  */
-class NettyBufferPool {
+public class NettyBufferPool {
+    public static final NettyBufferPool DEFAULT = new NettyBufferPool(256);
+
     private final int maxIdle;
     private final LinkedList<NettyBuffer> free;
-    
+
     public NettyBufferPool(int maxIdle) {
         this.maxIdle = maxIdle;
         this.free = new LinkedList<>();
     }
-    
+
     public NettyBuffer wrap(ByteBuf nettyBuffer) {
         synchronized (free) {
             NettyBuffer buf = free.poll();
@@ -26,7 +28,7 @@ class NettyBufferPool {
         }
         return new NettyBuffer(this, nettyBuffer);
     }
-    
+
     public void release(NettyBuffer buf) {
         buf.setHandle(null);
         synchronized (free) {

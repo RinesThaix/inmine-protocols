@@ -15,16 +15,6 @@
             <artifactId>shared</artifactId>
             <version>1.0</version>
         </dependency>
-        <dependency>
-            <groupId>org.inmine.protocol</groupId>
-            <artifactId>worker-plugin</artifactId>
-            <version>1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.inmine.protocol</groupId>
-            <artifactId>worker-client</artifactId>
-            <version>1.0</version>
-        </dependency>
     </dependencies>
 
     <properties>

@@ -12,16 +12,11 @@ import org.inmine.network.Packet;
  */
 @ChannelHandler.Sharable
 public class PacketEncoder extends MessageToByteEncoder<Packet> {
-    private final NettyBufferPool bufferPool;
-    
-    public PacketEncoder(NettyBufferPool bufferPool) {
-        this.bufferPool = bufferPool;
-    }
     
     @Override
     protected void encode(ChannelHandlerContext ctx, Packet packet, ByteBuf out) throws Exception {
         ByteBuf temp = ctx.alloc().buffer();
-        NettyBuffer buffer = bufferPool.wrap(temp);
+        NettyBuffer buffer = NettyBufferPool.DEFAULT.wrap(temp);
         try {
             buffer.writeSignedVarInt(packet.getId());
             packet.write(buffer);

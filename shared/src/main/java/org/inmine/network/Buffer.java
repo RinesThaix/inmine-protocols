@@ -322,4 +322,11 @@ public abstract class Buffer {
         }
     }
 
+    public Buffer newBuffer() {
+        return newBuffer(256);
+    }
+
+    public abstract Buffer newBuffer(int size);
+
+    public void release() {}
 }

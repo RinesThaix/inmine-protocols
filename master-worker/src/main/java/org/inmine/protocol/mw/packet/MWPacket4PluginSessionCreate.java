@@ -2,7 +2,7 @@ package org.inmine.protocol.mw.packet;
 
 import org.inmine.network.Buffer;
 import org.inmine.network.Packet;
-import org.inmine.protocol.wp.ServerType;
+import org.inmine.plugin.PluginType;
 
 import java.util.UUID;
 
@@ -11,14 +11,14 @@ import java.util.UUID;
  */
 public class MWPacket4PluginSessionCreate extends Packet {
 
-    public ServerType serverType;
+    public PluginType pluginType;
     public int projectId;
     public UUID session;
 
     public MWPacket4PluginSessionCreate() { }
 
-    public MWPacket4PluginSessionCreate(ServerType serverType, int projectId, UUID session) {
-        this.serverType = serverType;
+    public MWPacket4PluginSessionCreate(PluginType pluginType, int projectId, UUID session) {
+        this.pluginType = pluginType;
         this.projectId = projectId;
         this.session = session;
     }
@@ -30,14 +30,14 @@ public class MWPacket4PluginSessionCreate extends Packet {
 
     @Override
     public void write(Buffer buffer) {
-        buffer.writeEnum(this.serverType);
+        buffer.writeEnum(this.pluginType);
         buffer.writeVarInt(this.projectId);
         buffer.writeUUID(this.session);
     }
 
     @Override
     public void read(Buffer buffer) {
-        this.serverType = buffer.readEnum(ServerType.class);
+        this.pluginType = buffer.readEnum(PluginType.class);
         this.projectId = buffer.readVarInt();
         this.session = buffer.readUUID();
     }

@@ -16,9 +16,10 @@ public class PacketRegistry {
     
     private final int version;
     private final Map<Integer, Supplier<Packet>> constructors = new HashMap<>();
-    
+
+    @SuppressWarnings("unchecked")
     public PacketRegistry(int version, Supplier<Packet>... constructors) {
-        this.version = version;
+        this.version = version + 1000 * SHARED_PROTOCOL_VERSION;
         this.constructors.put(0, SPacketKeepAlive::new);
         this.constructors.put(-1, SPacketHandshake::new);
         this.constructors.put(-2, SPacketDisconnect::new);
@@ -36,6 +37,6 @@ public class PacketRegistry {
     }
     
     public int getVersion() {
-        return version + 1000 * SHARED_PROTOCOL_VERSION;
+        return version;
     }
 }

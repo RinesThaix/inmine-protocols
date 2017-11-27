@@ -47,7 +47,7 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
-                            <finalName>${name}</finalName>
+                            <finalName>${project.artifactId}</finalName>
                             <relocations>
                             </relocations>
                         </configuration>

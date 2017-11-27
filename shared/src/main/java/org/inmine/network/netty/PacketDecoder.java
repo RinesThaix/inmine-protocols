@@ -14,41 +14,39 @@ import java.util.List;
  * Created by RINES on 17.11.17.
  */
 public class PacketDecoder extends ByteToMessageDecoder {
-    
-    private final NettyBufferPool bufferPool;
+
     private final PacketRegistry packetRegistry;
-    
-    public PacketDecoder(NettyBufferPool bufferPool, PacketRegistry packetRegistry) {
-        this.bufferPool = bufferPool;
+
+    public PacketDecoder(PacketRegistry packetRegistry) {
         this.packetRegistry = packetRegistry;
     }
-    
+
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf buf, List<Object> out) throws Exception {
         int readerIndex = buf.readerIndex();
-        NettyBuffer buffer = bufferPool.wrap(buf);
+        NettyBuffer buffer = NettyBufferPool.DEFAULT.wrap(buf);
         try {
             int length = buffer.readVarInt();
             if (length >= 1_000_000)
                 throw new DecoderException("Maximum allowed packet length is " + 1_000_000 + ", received " + length);
-            
+
             if (buf.readableBytes() < length) {
                 buf.readerIndex(readerIndex);
                 return;
             }
-            
+
             readerIndex = buf.readerIndex();
-            
+
             int id = buffer.readSignedVarInt();
             Packet packet = this.packetRegistry.constructPacket(id);
             if (packet == null) {
                 buf.skipBytes(length);
                 throw new DecoderException("Unknown packet ID " + id + ", size=" + length);
             }
-            
+
             try {
                 packet.read(buffer);
-                
+
                 // Если не считаны все байты
                 if (buf.readerIndex() - readerIndex != length) {
                     int toSkip = length - (buf.readerIndex() - readerIndex);

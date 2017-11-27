@@ -8,7 +8,6 @@ import org.inmine.network.Packet;
  */
 public class CPacket4ChangeName extends Packet {
 
-    public int userId;
     public String name;
 
     @Override
@@ -18,13 +17,11 @@ public class CPacket4ChangeName extends Packet {
 
     @Override
     public void write(Buffer buffer) {
-        buffer.writeInt(this.userId);
         buffer.writeString(this.name);
     }
 
     @Override
     public void read(Buffer buffer) {
-        this.userId = buffer.readInt();
         this.name = buffer.readString(100);
     }
 }

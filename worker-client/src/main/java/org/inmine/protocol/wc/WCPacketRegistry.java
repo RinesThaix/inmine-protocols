@@ -14,7 +14,10 @@ import org.inmine.protocol.wc.packet.CPacket7IngameDisconnect;
  */
 public class WCPacketRegistry extends PacketRegistry {
 
-    public WCPacketRegistry() {
+    private static final WCPacketRegistry INSTANCE = new WCPacketRegistry();
+
+    @SuppressWarnings("unchecked")
+    private WCPacketRegistry() {
         super(1,
             CPacket1Login::new,
             CPacket2LoginResponse::new,
@@ -24,6 +27,10 @@ public class WCPacketRegistry extends PacketRegistry {
             CPacket6IngameConnectionResult::new,
             CPacket7IngameDisconnect::new
         );
+    }
+
+    public static WCPacketRegistry instance() {
+        return INSTANCE;
     }
 
 }
