@@ -52,16 +52,16 @@ public abstract class NettyClient extends CallbackHandler implements NetworkClie
     public void connect(String address, int port) {
         this.shuttingDown = false;
         this.logReconnectMessage = true;
-        if (bootstrap == null) {
+        if (this.bootstrap == null) {
             this.bootstrap = new Bootstrap()
                 .channel(NettyUtil.getChannel())
                 .group(NettyUtil.getWorkerLoopGroup())
                 .handler(new ClientChannelInitializer(this))
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000);
         }
-        if (callbackTickFuture == null)
+        if (this.callbackTickFuture == null)
             this.callbackTickFuture = NettyUtil.getWorkerLoopGroup().scheduleWithFixedDelay(this::callbackTick, 50L, 50L, TimeUnit.MILLISECONDS);
-        if (keepAliveFuture == null)
+        if (this.keepAliveFuture == null)
             this.keepAliveFuture = NettyUtil.getWorkerLoopGroup().scheduleWithFixedDelay(() -> {
                 if (this.connection == null)
                     return;
@@ -77,26 +77,26 @@ public abstract class NettyClient extends CallbackHandler implements NetworkClie
                     sendPacket(new SPacketKeepAlive());
                 }
             }, 1L, 1L, TimeUnit.SECONDS);
-        bootstrap.remoteAddress(address, port);
+        this.bootstrap.remoteAddress(address, port);
         connect();
     }
 
     private void connect() {
-        reconnectFuture = null;
-        connectFuture = this.bootstrap
+        this.reconnectFuture = null;
+        this.connectFuture = this.bootstrap
             .connect()
             .addListener((ChannelFutureListener) future -> {
-                connectFuture = null;
+                this.connectFuture = null;
                 if (future.isSuccess()) {
-                    logger.log(Level.INFO, "Connected to the server!");
-                    logReconnectMessage = true;
+                    this.logger.log(Level.INFO, "Connected to the server");
+                    this.logReconnectMessage = true;
                 } else {
-                    if (logReconnectMessage) {
-                        logger.log(Level.WARNING, "Could not connect to the server. I will connect as soon as the server is online..", future.cause());
-                        logReconnectMessage = false;
+                    if (this.logReconnectMessage) {
+                        this.logger.log(Level.WARNING, "Could not connect to the server. I will connect as soon as the server is online..", future.cause());
+                        this.logReconnectMessage = false;
                     }
                     if (!(future.cause() instanceof CancellationException))
-                        reconnectFuture = future.channel().eventLoop().schedule((Runnable) this::connect, 10L, TimeUnit.SECONDS);
+                        this.reconnectFuture = future.channel().eventLoop().schedule((Runnable) this::connect, 10L, TimeUnit.SECONDS);
                 }
             });
     }
@@ -104,27 +104,28 @@ public abstract class NettyClient extends CallbackHandler implements NetworkClie
     @Override
     public void disconnect() {
         this.shuttingDown = true;
-        if (connectFuture != null) {
-            connectFuture.cancel(true);
-            connectFuture = null;
+        if (this.connectFuture != null) {
+            this.connectFuture.cancel(true);
+            this.connectFuture = null;
         }
-        if (reconnectFuture != null) {
-            reconnectFuture.cancel(true);
-            reconnectFuture = null;
+        if (this.reconnectFuture != null) {
+            this.reconnectFuture.cancel(true);
+            this.reconnectFuture = null;
         }
-        if (callbackTickFuture != null) {
-            callbackTickFuture.cancel(false);
-            callbackTickFuture = null;
+        if (this.callbackTickFuture != null) {
+            this.callbackTickFuture.cancel(false);
+            this.callbackTickFuture = null;
         }
         super.callCallbacksTimeouts();
-        if (keepAliveFuture != null) {
-            keepAliveFuture.cancel(false);
-            keepAliveFuture = null;
+        if (this.keepAliveFuture != null) {
+            this.keepAliveFuture.cancel(false);
+            this.keepAliveFuture = null;
         }
         if (this.connection != null) {
             this.connection.getContext().channel().close().syncUninterruptibly();
             this.connection = null;
         }
+        this.logger.info("Disconnected from the server");
     }
 
     @Override
@@ -151,12 +152,12 @@ public abstract class NettyClient extends CallbackHandler implements NetworkClie
 
     @Override
     public void setPacketReceivedListener(Consumer<Packet> listener) {
-        packetReceivedListener = listener;
+        this.packetReceivedListener = listener;
     }
 
     @Override
     public void setPacketSentListener(Consumer<Packet> listener) {
-        packetSentListener = listener;
+        this.packetSentListener = listener;
     }
 
     public Logger getLogger() {
