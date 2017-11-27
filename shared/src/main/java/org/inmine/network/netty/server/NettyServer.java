@@ -61,15 +61,15 @@ public abstract class NettyServer extends CallbackHandler implements NetworkServ
             .childHandler(new ServerChannelInitializer(this));
         b.bind(address, port).addListener((ChannelFutureListener) future -> {
             if (future.isSuccess()) {
-                channel = future.channel();
-                logger.info("TCP listening on " + address + ":" + port);
+                this.channel = future.channel();
+                this.logger.info("TCP listening on " + address + ":" + port);
             } else {
-                logger.log(Level.WARNING, "Could not bind to host " + address + ":" + port, future.cause());
+                this.logger.log(Level.WARNING, "Could not bind to host " + address + ":" + port, future.cause());
             }
         });
-        if (callbackTickFuture == null)
-            callbackTickFuture = NettyUtil.getWorkerLoopGroup().scheduleWithFixedDelay(this::callbackTick, 50L, 50L, TimeUnit.MILLISECONDS);
-        if (keepAliveFuture == null)
+        if (this.callbackTickFuture == null)
+            this.callbackTickFuture = NettyUtil.getWorkerLoopGroup().scheduleWithFixedDelay(this::callbackTick, 50L, 50L, TimeUnit.MILLISECONDS);
+        if (this.keepAliveFuture == null)
             this.keepAliveFuture = NettyUtil.getWorkerLoopGroup().scheduleWithFixedDelay(() -> {
                 long current = System.currentTimeMillis();
                 for (NettyConnection connection : this.connections.values()) {
@@ -86,18 +86,18 @@ public abstract class NettyServer extends CallbackHandler implements NetworkServ
 
     @Override
     public void stop() {
-        if (callbackTickFuture != null) {
-            callbackTickFuture.cancel(false);
-            callbackTickFuture = null;
+        if (this.callbackTickFuture != null) {
+            this.callbackTickFuture.cancel(false);
+            this.callbackTickFuture = null;
         }
-        if (keepAliveFuture != null) {
-            keepAliveFuture.cancel(false);
-            keepAliveFuture = null;
+        if (this.keepAliveFuture != null) {
+            this.keepAliveFuture.cancel(false);
+            this.keepAliveFuture = null;
         }
         super.callCallbacksTimeouts();
-        if (channel != null) {
-            logger.info("Closing tcp listener");
-            channel.close().syncUninterruptibly();
+        if (this.channel != null) {
+            this.logger.info("Closing tcp listener");
+            this.channel.close().syncUninterruptibly();
         }
     }
 
