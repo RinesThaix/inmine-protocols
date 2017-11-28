@@ -15,6 +15,7 @@ public class WPPacketRegistry extends PacketRegistry {
         super(1,
             PPacket1Connect::new,
             PPacket2ConnectionResponse::new,
+            PPacket3RevalidatePlayers::new,
             PPacket4AwaitPlayer::new,
             PPacket5PlayerAwaitingResponse::new,
             PPacket6RegisterPlayer::new,

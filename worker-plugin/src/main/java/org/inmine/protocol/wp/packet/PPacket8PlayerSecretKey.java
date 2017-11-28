@@ -31,7 +31,7 @@ public class PPacket8PlayerSecretKey extends Packet {
 
     @Override
     public void read(Buffer buffer) {
-        this.nickname = buffer.readString(16);
+        this.nickname = buffer.readString(40);
         this.secretKey = buffer.readString(16);
     }
 

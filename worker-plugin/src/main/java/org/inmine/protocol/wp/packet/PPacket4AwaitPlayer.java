@@ -34,7 +34,7 @@ public class PPacket4AwaitPlayer extends CallbackPacket {
     public void read(Buffer buffer) {
         super.read(buffer);
         this.address = buffer.readString(50);
-        this.nickname = buffer.readStringNullable(16);
+        this.nickname = buffer.readStringNullable(40);
     }
 
 }
