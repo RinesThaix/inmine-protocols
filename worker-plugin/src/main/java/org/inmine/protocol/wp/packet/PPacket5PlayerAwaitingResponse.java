@@ -11,6 +11,13 @@ public class PPacket5PlayerAwaitingResponse extends CallbackPacket {
     public Status status;
     public String nickname;
 
+    public PPacket5PlayerAwaitingResponse() { }
+
+    public PPacket5PlayerAwaitingResponse(Status status, String nickname) {
+        this.status = status;
+        this.nickname = nickname;
+    }
+
     @Override
     public int getId() {
         return 5;

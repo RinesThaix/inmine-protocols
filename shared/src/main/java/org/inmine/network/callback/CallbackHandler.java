@@ -42,7 +42,6 @@ public class CallbackHandler {
         });
     }
     
-    @SuppressWarnings("unchecked")
     public <T extends Packet> void onPacketPreReceived(T packet) {
         if (packet instanceof CallbackPacket) {
             int id = ((CallbackPacket) packet).callbackId;

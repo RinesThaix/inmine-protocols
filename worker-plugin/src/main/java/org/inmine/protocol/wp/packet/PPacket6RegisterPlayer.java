@@ -9,12 +9,14 @@ import org.inmine.network.Packet;
  */
 public class PPacket6RegisterPlayer extends Packet {
 
+    public int userId;
     public String nickname;
 
     public PPacket6RegisterPlayer() { }
 
-    public PPacket6RegisterPlayer(String nickname) {
+    public PPacket6RegisterPlayer(int userId, String nickname) {
         this.nickname = nickname;
+        this.userId = userId;
     }
 
     @Override
@@ -24,12 +26,14 @@ public class PPacket6RegisterPlayer extends Packet {
 
     @Override
     public void write(Buffer buffer) {
+        buffer.writeInt(userId);
         buffer.writeString(this.nickname);
     }
 
     @Override
     public void read(Buffer buffer) {
-        this.nickname = buffer.readString(16);
+        this.userId = buffer.readInt();
+        this.nickname = buffer.readString(40);
     }
 
 }

@@ -1,6 +1,7 @@
 package org.inmine.network.callback;
 
 import org.inmine.network.Buffer;
+import org.inmine.network.Connection;
 import org.inmine.network.Packet;
 
 /**
@@ -20,4 +21,8 @@ public abstract class CallbackPacket extends Packet {
         this.callbackId = buffer.readVarInt();
     }
 
+    public void respond(Connection connection, CallbackPacket response) {
+        response.callbackId = this.callbackId;
+        connection.sendPacket(response);
+    }
 }

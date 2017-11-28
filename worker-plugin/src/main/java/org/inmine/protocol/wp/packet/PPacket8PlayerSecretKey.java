@@ -11,6 +11,13 @@ public class PPacket8PlayerSecretKey extends Packet {
     public String nickname;
     public String secretKey;
 
+    public PPacket8PlayerSecretKey() { }
+
+    public PPacket8PlayerSecretKey(String nickname, String secretKey) {
+        this.nickname = nickname;
+        this.secretKey = secretKey;
+    }
+
     @Override
     public int getId() {
         return 8;

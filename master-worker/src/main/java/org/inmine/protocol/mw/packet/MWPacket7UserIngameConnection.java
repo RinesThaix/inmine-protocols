@@ -11,13 +11,15 @@ import java.util.UUID;
 public class MWPacket7UserIngameConnection extends Packet {
 
     public UUID userSession;
-    public String address;
+    public String userAddress;
+    public String serverAddress;
 
     public MWPacket7UserIngameConnection() { }
 
-    public MWPacket7UserIngameConnection(UUID userSession, String address) {
+    public MWPacket7UserIngameConnection(UUID userSession, String userAddress, String serverAddress) {
         this.userSession = userSession;
-        this.address = address;
+        this.userAddress = userAddress;
+        this.serverAddress = serverAddress;
     }
 
     @Override
@@ -28,12 +30,14 @@ public class MWPacket7UserIngameConnection extends Packet {
     @Override
     public void write(Buffer buffer) {
         buffer.writeUUID(this.userSession);
-        buffer.writeString(this.address);
+        buffer.writeString(this.userAddress);
+        buffer.writeString(this.serverAddress);
     }
 
     @Override
     public void read(Buffer buffer) {
         this.userSession = buffer.readUUID();
-        this.address = buffer.readString(50);
+        this.userAddress = buffer.readString(50);
+        this.serverAddress = buffer.readString(50);
     }
 }
