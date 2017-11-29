@@ -25,7 +25,8 @@ public class WPPacketRegistry extends PacketRegistry {
             PPacket10CreateVoiceRoom::new,
             PPacket11VoiceRoomCreated::new,
             PPacket12MovePlayer::new,
-            PPacket13DeleteVoiceRoom::new
+            PPacket13DeleteVoiceRoom::new,
+            PPacket14ChatMessage::new
         );
     }
 
