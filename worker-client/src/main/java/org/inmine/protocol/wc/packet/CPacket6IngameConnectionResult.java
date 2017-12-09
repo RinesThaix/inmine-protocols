@@ -43,7 +43,7 @@ public class CPacket6IngameConnectionResult extends Packet {
     public void read(Buffer buffer) {
         this.status = buffer.readEnum(Status.class);
         if (this.status == Status.SUCCESS) {
-            this.nickname = buffer.readString(16);
+            this.nickname = buffer.readString(NICKNAME_SIZE);
         } else if (this.status == Status.ENTER_APPROVAL_KEY) {
             this.secretKey = buffer.readString(16);
         } else {

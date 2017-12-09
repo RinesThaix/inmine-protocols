@@ -23,7 +23,7 @@ public class PPacket7UnregisterPlayer extends Packet {
 
     @Override
     public void read(Buffer buffer) {
-        this.nickname = buffer.readString(40);
+        this.nickname = buffer.readString(NICKNAME_SIZE);
     }
 
 }

@@ -33,8 +33,8 @@ public class PPacket4AwaitPlayer extends CallbackPacket {
     @Override
     public void read(Buffer buffer) {
         super.read(buffer);
-        this.address = buffer.readString(50);
-        this.nickname = buffer.readStringNullable(40);
+        this.address = buffer.readString(ADDRESS_SIZE);
+        this.nickname = buffer.readStringNullable(NICKNAME_SIZE);
     }
 
 }

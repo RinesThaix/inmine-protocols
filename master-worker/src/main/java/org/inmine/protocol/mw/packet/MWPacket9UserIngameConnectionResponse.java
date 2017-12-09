@@ -45,7 +45,7 @@ public class MWPacket9UserIngameConnectionResponse extends Packet {
         this.status = buffer.readEnum(Status.class);
         if (this.status == Status.OK) {
             this.pluginSession = buffer.readUUID();
-            this.nickname = buffer.readString(16);
+            this.nickname = buffer.readString(NICKNAME_SIZE);
         }
     }
 

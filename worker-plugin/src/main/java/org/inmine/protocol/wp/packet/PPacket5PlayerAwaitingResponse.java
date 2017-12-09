@@ -36,7 +36,7 @@ public class PPacket5PlayerAwaitingResponse extends CallbackPacket {
         super.read(buffer);
         this.status = buffer.readEnum(Status.class);
         if (this.status == Status.OK)
-            this.nickname = buffer.readString(40);
+            this.nickname = buffer.readString(NICKNAME_SIZE);
     }
 
     public enum Status {

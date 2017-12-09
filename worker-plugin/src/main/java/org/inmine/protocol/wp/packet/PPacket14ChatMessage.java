@@ -31,7 +31,7 @@ public class PPacket14ChatMessage extends Packet {
 
     @Override
     public void read(Buffer buffer) {
-        this.player = buffer.readString(40);
+        this.player = buffer.readString(NICKNAME_SIZE);
         this.message = buffer.readEnum(Message.class);
     }
 

@@ -37,7 +37,7 @@ public class MWPacket7UserIngameConnection extends Packet {
     @Override
     public void read(Buffer buffer) {
         this.userSession = buffer.readUUID();
-        this.userAddress = buffer.readString(50);
-        this.serverAddress = buffer.readString(50);
+        this.userAddress = buffer.readString(ADDRESS_SIZE);
+        this.serverAddress = buffer.readString(ADDRESS_SIZE);
     }
 }

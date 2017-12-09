@@ -22,7 +22,7 @@ public class CPacket5IngameConnection extends Packet {
 
     @Override
     public void read(Buffer buffer) {
-        this.address = buffer.readString(16);
+        this.address = buffer.readString(ADDRESS_SIZE);
     }
 
 }

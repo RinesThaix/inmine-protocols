@@ -33,7 +33,7 @@ public class PPacket6RegisterPlayer extends Packet {
     @Override
     public void read(Buffer buffer) {
         this.userId = buffer.readInt();
-        this.nickname = buffer.readString(40);
+        this.nickname = buffer.readString(NICKNAME_SIZE);
     }
 
 }
