@@ -34,7 +34,8 @@ public abstract class PacketProcessor {
             List<BiConsumer<UUID, Packet>> handlers = this.handlers.get(packet.getClass());
             if (handlers == null)
                 return;
-            handlers.forEach(handler -> handler.accept(session, packet));
+            for (BiConsumer<UUID, Packet> handler : handlers)
+                handler.accept(session, packet);
         }
 
     }

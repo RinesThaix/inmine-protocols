@@ -52,12 +52,12 @@ public class PacketDecoder extends ByteToMessageDecoder {
                     int toSkip = length - (buf.readerIndex() - readerIndex);
                     buf.skipBytes(toSkip);
                     ctx.channel().attr(HandlerBoss.BOSS_KEY).get().getLogger().warning(
-                        "After reading packet ID " + id + ", there are " + toSkip + " bytes left (length " + length + "). Packet ignored."
+                        "After reading packet " + packet.getClass().getSimpleName() + ", there are " + toSkip + " bytes left (length " + length + "). Packet ignored."
                     );
                     return;
                 }
             } catch (Exception ex) {
-                throw new DecoderException("Decoding packet ID " + id + ", size=" + length, ex);
+                throw new DecoderException("Decoding packet " + packet.getClass().getSimpleName() + ", size=" + length, ex);
             }
             out.add(packet);
         } finally {

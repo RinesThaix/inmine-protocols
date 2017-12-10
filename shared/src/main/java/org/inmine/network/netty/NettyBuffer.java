@@ -3,7 +3,6 @@ package org.inmine.network.netty;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.PooledByteBufAllocator;
-import io.netty.buffer.Unpooled;
 
 import org.inmine.network.Buffer;
 
@@ -133,13 +132,14 @@ public class NettyBuffer extends Buffer {
 
     @Override
     public NettyBuffer newBuffer(int size) {
-        if (pool != null) {
-            NettyBuffer wrapped = this.pool.wrap(PooledByteBufAllocator.DEFAULT.buffer(size));
-            wrapped.releaseNetty = true;
-            return wrapped;
-        } else {
-            return new NettyBuffer(Unpooled.buffer(size));
-        }
+        ByteBuf buf = buffer.alloc().buffer(size);
+        NettyBuffer wrapped;
+        if (pool != null)
+            wrapped = this.pool.wrap(buf);
+        else
+            wrapped = new NettyBuffer(buf);
+        wrapped.releaseNetty = true;
+        return wrapped;
     }
 
 }

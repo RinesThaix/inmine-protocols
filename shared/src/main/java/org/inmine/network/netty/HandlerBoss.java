@@ -16,48 +16,48 @@ import java.util.logging.Logger;
  * Created by RINES on 17.11.17.
  */
 public class HandlerBoss extends ChannelInboundHandlerAdapter {
-    
+
     public static final AttributeKey<HandlerBoss> BOSS_KEY = AttributeKey.newInstance("HandlerBoss");
-    
+
     private NettyPacketHandler handler;
     private final Logger logger;
-    
+
     public HandlerBoss(NettyPacketHandler initialHandler, Logger logger) {
         this.handler = initialHandler;
         this.logger = logger;
     }
-    
+
     public Logger getLogger() {
         return logger;
     }
-    
+
     public NettyPacketHandler getHandler() {
         return this.handler;
     }
-    
+
     public void setHandler(NettyPacketHandler handler) {
         this.handler = handler;
     }
-    
+
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         this.handler.onConnect(ctx);
     }
-    
+
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         this.handler.onDisconnect(ctx);
     }
-    
+
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         try {
             this.handler.handle((Packet) msg);
         } catch (Exception ex) {
-            throw new Exception("Cannot handle " + msg.getClass().getSimpleName() + " for " + ctx.channel().remoteAddress());
+            throw new PacketHandleException(msg.getClass().getSimpleName(), ex);
         }
     }
-    
+
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         if (ctx.channel().isActive()) {
@@ -67,6 +67,8 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
                 this.logger.log(Level.INFO, ctx.channel().remoteAddress() + " - IOException: " + cause.getMessage());
             } else if (cause instanceof DecoderException) {
                 this.logger.log(Level.INFO, ctx.channel().remoteAddress() + " - Decoder exception: ", cause);
+            } else if (cause instanceof PacketHandleException) {
+                this.logger.log(Level.INFO, ctx.channel().remoteAddress() + " - Cannot handle packet: " + cause.getMessage(), cause.getCause());
             } else {
                 this.logger.log(Level.WARNING, ctx.channel().remoteAddress() + " - Encountered exception", cause);
             }
