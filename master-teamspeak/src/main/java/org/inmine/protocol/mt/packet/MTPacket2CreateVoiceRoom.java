@@ -1,43 +1,48 @@
-package org.inmine.protocol.wp.packet;
+package org.inmine.protocol.mt.packet;
 
 import org.inmine.network.Buffer;
-import org.inmine.network.callback.CallbackPacket;
+import org.inmine.network.Packet;
+
+import java.util.UUID;
 
 /**
  * @author xtrafrancyz
  */
-public class PPacket10CreateVoiceRoom extends CallbackPacket {
+public class MTPacket2CreateVoiceRoom extends Packet {
+    public UUID roomId;
     public Type type;
     public int radius;
 
-    public PPacket10CreateVoiceRoom() { }
+    public MTPacket2CreateVoiceRoom() { }
 
-    public PPacket10CreateVoiceRoom(Type type) {
+    public MTPacket2CreateVoiceRoom(UUID roomId, Type type) {
+        this.roomId = roomId;
         this.type = type;
     }
 
-    public PPacket10CreateVoiceRoom(Type type, int radius) {
+    public MTPacket2CreateVoiceRoom(UUID roomId, Type type, int radius) {
+        this.roomId = roomId;
         this.type = type;
         this.radius = radius;
     }
 
     @Override
     public int getId() {
-        return 10;
+        return 2;
     }
 
     @Override
     public void write(Buffer buffer) {
-        super.write(buffer);
-        buffer.writeEnum(this.type);
+        buffer.writeUUID(roomId);
+        buffer.writeEnum(type);
         if (type == Type.POSITIONAL)
             buffer.writeVarInt(radius);
     }
 
     @Override
     public void read(Buffer buffer) {
-        super.read(buffer);
-        this.type = buffer.readEnum(Type.class);
+        roomId = buffer.readUUID();
+        type = buffer.readEnum(Type.class);
         if (type == Type.POSITIONAL)
             radius = buffer.readVarInt();
     }
