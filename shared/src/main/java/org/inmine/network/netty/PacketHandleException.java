@@ -11,7 +11,7 @@ class PacketHandleException extends Exception {
         super(message, cause, false, false);
         StackTraceElement[] trace = cause.getStackTrace();
         List<StackTraceElement> trimmedTrace = new ArrayList<>();
-        for (int i = 1; i < trace.length; i++) {
+        for (int i = 0; i < trace.length; i++) {
             if (trace[i].getClassName().contains("io.netty."))
                 break;
             trimmedTrace.add(trace[i]);

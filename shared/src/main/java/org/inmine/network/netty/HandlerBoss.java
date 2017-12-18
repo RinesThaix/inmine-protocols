@@ -66,9 +66,9 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
             } else if (cause instanceof IOException) {
                 this.logger.log(Level.INFO, ctx.channel().remoteAddress() + " - IOException: " + cause.getMessage());
             } else if (cause instanceof DecoderException) {
-                this.logger.log(Level.INFO, ctx.channel().remoteAddress() + " - Decoder exception: ", cause);
+                this.logger.log(Level.WARNING, ctx.channel().remoteAddress() + " - Decoder exception: ", cause);
             } else if (cause instanceof PacketHandleException) {
-                this.logger.log(Level.INFO, ctx.channel().remoteAddress() + " - Cannot handle packet: " + cause.getMessage(), cause.getCause());
+                this.logger.log(Level.WARNING, ctx.channel().remoteAddress() + " - Can not handle packet: " + cause.getMessage(), cause.getCause());
             } else {
                 this.logger.log(Level.WARNING, ctx.channel().remoteAddress() + " - Encountered exception", cause);
             }

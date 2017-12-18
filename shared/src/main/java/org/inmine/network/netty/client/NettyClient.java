@@ -59,6 +59,12 @@ public abstract class NettyClient extends CallbackHandler implements NetworkClie
                 .handler(new ClientChannelInitializer(this))
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000);
         }
+        this.bootstrap.remoteAddress(address, port);
+        connect();
+    }
+
+    private void connect() {
+        this.reconnectFuture = null;
         if (this.callbackTickFuture == null)
             this.callbackTickFuture = NettyUtil.getWorkerLoopGroup().scheduleWithFixedDelay(this::callbackTick, 50L, 50L, TimeUnit.MILLISECONDS);
         if (this.keepAliveFuture == null)
@@ -77,12 +83,6 @@ public abstract class NettyClient extends CallbackHandler implements NetworkClie
                     sendPacket(new SPacketKeepAlive());
                 }
             }, 1L, 1L, TimeUnit.SECONDS);
-        this.bootstrap.remoteAddress(address, port);
-        connect();
-    }
-
-    private void connect() {
-        this.reconnectFuture = null;
         this.connectFuture = this.bootstrap
             .connect()
             .addListener((ChannelFutureListener) future -> {
