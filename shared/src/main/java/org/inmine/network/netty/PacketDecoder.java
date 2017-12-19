@@ -25,16 +25,41 @@ public class PacketDecoder extends ByteToMessageDecoder {
     protected void decode(ChannelHandlerContext ctx, ByteBuf buf, List<Object> out) throws Exception {
         int readerIndex = buf.readerIndex();
 
-        int length = safeReadUnsignedVarInt(buf);
+        int length = 0;
 
-        // Не хватает байт для чтения пакета
-        if (length == -1 || buf.readableBytes() < length) {
+        { // Считывания варинта, пока есть данные. Если данных не хватает - ждем
+            int bytes = 0;
+            byte in;
+            while (true) {
+                // Костыль для проверки что у нас еще есть что читать
+                if (buf.readableBytes() == 0) {
+                    buf.readerIndex(readerIndex);
+                    return;
+                }
+
+                in = buf.readByte();
+
+                length |= (in & 0x7F) << (bytes++ * 7);
+
+                if (bytes > 5)
+                    throw new DecoderException("Wrong packet length");
+
+                if ((in & 0x80) != 0x80)
+                    break;
+            }
+        }
+
+        if (length < 0)
+            throw new DecoderException("Packet length must be >= zero , received " + length);
+
+        if (length > 1_000_000)
+            throw new DecoderException("Maximum allowed packet length is " + 1_000_000 + ", received " + length);
+
+        // Пакет пришел не полностью
+        if (buf.readableBytes() < length) {
             buf.readerIndex(readerIndex);
             return;
         }
-
-        if (length >= 1_000_000)
-            throw new DecoderException("Maximum allowed packet length is " + 1_000_000 + ", received " + length);
 
         NettyBuffer buffer = NettyBufferPool.DEFAULT.wrap(buf);
         try {
@@ -68,26 +93,5 @@ public class PacketDecoder extends ByteToMessageDecoder {
         } finally {
             buffer.release();
         }
-    }
-
-    private static int safeReadUnsignedVarInt(ByteBuf buffer) {
-        int out = 0;
-        int bytes = 0;
-        byte in;
-        while (true) {
-            if (buffer.readableBytes() == 0)
-                return -1;
-            in = buffer.readByte();
-
-            out |= (in & 0x7F) << (bytes++ * 7);
-
-            if (bytes > 5)
-                throw new DecoderException("VarInt too big");
-
-            if ((in & 0x80) != 0x80)
-                break;
-        }
-
-        return out;
     }
 }
