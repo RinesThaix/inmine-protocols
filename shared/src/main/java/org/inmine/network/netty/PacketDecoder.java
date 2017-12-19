@@ -5,6 +5,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.DecoderException;
 
+import org.inmine.network.NetworkStatisticsImpl;
 import org.inmine.network.Packet;
 import org.inmine.network.PacketRegistry;
 
@@ -15,9 +16,11 @@ import java.util.List;
  */
 public class PacketDecoder extends ByteToMessageDecoder {
 
+    private final NetworkStatisticsImpl statistics;
     private final PacketRegistry packetRegistry;
 
-    public PacketDecoder(PacketRegistry packetRegistry) {
+    public PacketDecoder(NetworkStatisticsImpl statistics, PacketRegistry packetRegistry) {
+        this.statistics = statistics;
         this.packetRegistry = packetRegistry;
     }
 
@@ -26,9 +29,9 @@ public class PacketDecoder extends ByteToMessageDecoder {
         int readerIndex = buf.readerIndex();
 
         int length = 0;
+        int lengthOfLength = 0;
 
         { // Считывания варинта, пока есть данные. Если данных не хватает - ждем
-            int bytes = 0;
             byte in;
             while (true) {
                 // Костыль для проверки что у нас еще есть что читать
@@ -39,9 +42,9 @@ public class PacketDecoder extends ByteToMessageDecoder {
 
                 in = buf.readByte();
 
-                length |= (in & 0x7F) << (bytes++ * 7);
+                length |= (in & 0x7F) << (lengthOfLength++ * 7);
 
-                if (bytes > 5)
+                if (lengthOfLength > 5)
                     throw new DecoderException("Wrong packet length");
 
                 if ((in & 0x80) != 0x80)
@@ -89,6 +92,10 @@ public class PacketDecoder extends ByteToMessageDecoder {
             } catch (Exception ex) {
                 throw new DecoderException("Decoding packet " + packet.getClass().getSimpleName() + ", size=" + length, ex);
             }
+
+            statistics.receivedPackets().addAndGet(1);
+            statistics.receivedBytes().addAndGet(length + lengthOfLength);
+
             out.add(packet);
         } finally {
             buffer.release();

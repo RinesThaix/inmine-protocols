@@ -8,6 +8,8 @@ import io.netty.channel.ChannelOption;
 import io.netty.util.concurrent.ScheduledFuture;
 
 import org.inmine.network.NetworkClient;
+import org.inmine.network.NetworkStatistics;
+import org.inmine.network.NetworkStatisticsImpl;
 import org.inmine.network.Packet;
 import org.inmine.network.PacketRegistry;
 import org.inmine.network.callback.CallbackHandler;
@@ -40,12 +42,14 @@ public abstract class NettyClient extends CallbackHandler implements NetworkClie
     private Bootstrap bootstrap;
     private boolean shuttingDown;
     private boolean logReconnectMessage;
+    private NetworkStatisticsImpl statistics;
     Consumer<Packet> packetReceivedListener;
     Consumer<Packet> packetSentListener;
 
     public NettyClient(Logger logger, PacketRegistry packetRegistry) {
         this.packetRegistry = packetRegistry;
         this.logger = logger;
+        this.statistics = new NetworkStatisticsImpl();
     }
 
     @Override
@@ -158,6 +162,11 @@ public abstract class NettyClient extends CallbackHandler implements NetworkClie
     @Override
     public void setPacketSentListener(Consumer<Packet> listener) {
         this.packetSentListener = listener;
+    }
+
+    @Override
+    public NetworkStatistics getStatistics() {
+        return this.statistics;
     }
 
     public Logger getLogger() {

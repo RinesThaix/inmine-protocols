@@ -46,5 +46,7 @@ public interface NetworkClient {
     void setPacketReceivedListener(Consumer<Packet> listener);
 
     void setPacketSentListener(Consumer<Packet> listener);
+
+    NetworkStatistics getStatistics();
     
 }

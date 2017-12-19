@@ -8,6 +8,8 @@ import io.netty.util.concurrent.ScheduledFuture;
 
 import org.inmine.network.Connection;
 import org.inmine.network.NetworkServer;
+import org.inmine.network.NetworkStatistics;
+import org.inmine.network.NetworkStatisticsImpl;
 import org.inmine.network.Packet;
 import org.inmine.network.PacketRegistry;
 import org.inmine.network.callback.CallbackHandler;
@@ -37,6 +39,7 @@ public abstract class NettyServer extends CallbackHandler implements NetworkServ
 
     private ScheduledFuture<?> callbackTickFuture = null;
     private ScheduledFuture<?> keepAliveFuture = null;
+    private NetworkStatisticsImpl statistics;
 
     BiConsumer<Connection, Packet> packetReceivedListener;
     BiConsumer<Connection, Packet> packetSentListener;
@@ -44,6 +47,7 @@ public abstract class NettyServer extends CallbackHandler implements NetworkServ
     public NettyServer(Logger logger, PacketRegistry packetRegistry) {
         this.packetRegistry = packetRegistry;
         this.logger = logger;
+        this.statistics = new NetworkStatisticsImpl();
     }
 
     private String address;
@@ -143,6 +147,11 @@ public abstract class NettyServer extends CallbackHandler implements NetworkServ
     @Override
     public void setPacketSentListener(BiConsumer<Connection, Packet> packetSentListener) {
         this.packetSentListener = packetSentListener;
+    }
+
+    @Override
+    public NetworkStatistics getStatistics() {
+        return this.statistics;
     }
 
     public Logger getLogger() {

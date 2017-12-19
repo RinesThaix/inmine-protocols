@@ -28,4 +28,6 @@ public interface NetworkServer {
 
     void setPacketSentListener(BiConsumer<Connection, Packet> listener);
 
+    NetworkStatistics getStatistics();
+
 }

@@ -47,6 +47,9 @@ public class NettyTester {
                 logger.info("Stopping the server..");
                 stop();
                 NettyUtil.shutdownLoopGroups();
+
+                logger.info("[Server] Sent bytes " + getStatistics().getSentBytes());
+                logger.info("[Server] Received bytes " + getStatistics().getReceivedBytes());
             }
         };
         NettyClient client = new NettyClient(logger, registry) {
@@ -73,6 +76,9 @@ public class NettyTester {
             @Override
             public void onDisconnected() {
                 logger.info("Disconnecting the client..");
+
+                logger.info("[Client] Sent bytes " + getStatistics().getSentBytes());
+                logger.info("[Client] Received bytes " + getStatistics().getReceivedBytes());
             }
         };
         server.start("localhost", 8940);
