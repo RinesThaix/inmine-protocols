@@ -24,17 +24,20 @@ public class PacketDecoder extends ByteToMessageDecoder {
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf buf, List<Object> out) throws Exception {
         int readerIndex = buf.readerIndex();
+
+        int length = safeReadUnsignedVarInt(buf);
+
+        // Не хватает байт для чтения пакета
+        if (length == -1 || buf.readableBytes() < length) {
+            buf.readerIndex(readerIndex);
+            return;
+        }
+
+        if (length >= 1_000_000)
+            throw new DecoderException("Maximum allowed packet length is " + 1_000_000 + ", received " + length);
+
         NettyBuffer buffer = NettyBufferPool.DEFAULT.wrap(buf);
         try {
-            int length = buffer.readVarInt();
-            if (length >= 1_000_000)
-                throw new DecoderException("Maximum allowed packet length is " + 1_000_000 + ", received " + length);
-
-            if (buf.readableBytes() < length) {
-                buf.readerIndex(readerIndex);
-                return;
-            }
-
             readerIndex = buf.readerIndex();
 
             int id = buffer.readSignedVarInt();
@@ -49,10 +52,12 @@ public class PacketDecoder extends ByteToMessageDecoder {
 
                 // Если не считаны все байты
                 if (buf.readerIndex() - readerIndex != length) {
-                    int toSkip = length - (buf.readerIndex() - readerIndex);
-                    buf.skipBytes(toSkip);
+                    buf.readerIndex(readerIndex + length);
+                    int diff = length - (buf.readerIndex() - readerIndex);
                     ctx.channel().attr(HandlerBoss.BOSS_KEY).get().getLogger().warning(
-                        "After reading packet " + packet.getClass().getSimpleName() + ", there are " + toSkip + " bytes left (length " + length + "). Packet ignored."
+                        "After reading packet " + packet.getClass().getSimpleName() + ", there are " +
+                            (diff > 0 ? diff + " bytes left" : -diff + " extra bytes read") +
+                            " (length " + length + "). Packet ignored."
                     );
                     return;
                 }
@@ -63,5 +68,26 @@ public class PacketDecoder extends ByteToMessageDecoder {
         } finally {
             buffer.release();
         }
+    }
+
+    private static int safeReadUnsignedVarInt(ByteBuf buffer) {
+        int out = 0;
+        int bytes = 0;
+        byte in;
+        while (true) {
+            if (buffer.readableBytes() == 0)
+                return -1;
+            in = buffer.readByte();
+
+            out |= (in & 0x7F) << (bytes++ * 7);
+
+            if (bytes > 5)
+                throw new DecoderException("VarInt too big");
+
+            if ((in & 0x80) != 0x80)
+                break;
+        }
+
+        return out;
     }
 }
