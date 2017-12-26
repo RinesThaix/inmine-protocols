@@ -40,7 +40,7 @@ public abstract class NettyClient extends CallbackHandler implements NetworkClie
     private ScheduledFuture<?> reconnectFuture;
     private ScheduledFuture<?> keepAliveFuture;
     private Bootstrap bootstrap;
-    private boolean shuttingDown;
+    private volatile boolean shuttingDown;
     private boolean logReconnectMessage;
     private NetworkStatisticsImpl statistics;
     Consumer<Packet> packetReceivedListener;
@@ -68,6 +68,8 @@ public abstract class NettyClient extends CallbackHandler implements NetworkClie
     }
 
     private void connect() {
+        if (connectFuture != null)
+            return;
         this.reconnectFuture = null;
         if (this.callbackTickFuture == null)
             this.callbackTickFuture = NettyUtil.getWorkerLoopGroup().scheduleWithFixedDelay(this::callbackTick, 50L, 50L, TimeUnit.MILLISECONDS);
