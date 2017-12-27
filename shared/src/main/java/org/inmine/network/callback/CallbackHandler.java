@@ -17,21 +17,25 @@ public class CallbackHandler {
     private Map<Integer, CallbackData> callbacks = new ConcurrentHashMap<>();
     
     protected void callbackTick() {
-        long current = System.currentTimeMillis();
-        Iterator<Map.Entry<Integer, CallbackData>> iterator = this.callbacks.entrySet().iterator();
-        while (iterator.hasNext()) {
-            Map.Entry<Integer, CallbackData> entry = iterator.next();
-            CallbackData data = entry.getValue();
-            if (current - data.getInitializationTime() > data.getTimeout()) {
-                iterator.remove();
-                try {
-                    if (data.getOnTimeout() == null)
-                        return;
-                    data.getOnTimeout().run();
-                } catch (Exception ex) {
-                    new Exception("Can not process onTimeout for packet with id " + entry.getKey(), ex).printStackTrace();
+        try {
+            long current = System.currentTimeMillis();
+            Iterator<Map.Entry<Integer, CallbackData>> iterator = this.callbacks.entrySet().iterator();
+            while (iterator.hasNext()) {
+                Map.Entry<Integer, CallbackData> entry = iterator.next();
+                CallbackData data = entry.getValue();
+                if (current - data.getInitializationTime() > data.getTimeout()) {
+                    iterator.remove();
+                    try {
+                        if (data.getOnTimeout() == null)
+                            return;
+                        data.getOnTimeout().run();
+                    } catch (Exception ex) {
+                        new Exception("Can not process onTimeout for packet with id " + entry.getKey(), ex).printStackTrace();
+                    }
                 }
             }
+        }catch(Exception e1) {
+            e1.printStackTrace();
         }
     }
     

@@ -75,15 +75,19 @@ public abstract class NettyServer extends CallbackHandler implements NetworkServ
             this.callbackTickFuture = NettyUtil.getWorkerLoopGroup().scheduleWithFixedDelay(this::callbackTick, 50L, 50L, TimeUnit.MILLISECONDS);
         if (this.keepAliveFuture == null)
             this.keepAliveFuture = NettyUtil.getWorkerLoopGroup().scheduleWithFixedDelay(() -> {
-                long current = System.currentTimeMillis();
-                for (NettyConnection connection : this.connections.values()) {
-                    NettyPacketHandler handler = connection.getHandler();
-                    if (current - handler.getLastPacketReceivedTime() > 40000L) {
-                        connection.disconnect();
-                        continue;
+                try {
+                    long current = System.currentTimeMillis();
+                    for (NettyConnection connection : this.connections.values()) {
+                        NettyPacketHandler handler = connection.getHandler();
+                        if (current - handler.getLastPacketReceivedTime() > 40000L) {
+                            connection.disconnect();
+                            continue;
+                        }
+                        if (current - handler.getLastPacketSentTime() > 30000L)
+                            connection.sendPacket(new SPacketKeepAlive());
                     }
-                    if (current - handler.getLastPacketSentTime() > 30000L)
-                        connection.sendPacket(new SPacketKeepAlive());
+                }catch(Exception e2) {
+                    e2.printStackTrace();
                 }
             }, 5L, 5L, TimeUnit.SECONDS);
     }

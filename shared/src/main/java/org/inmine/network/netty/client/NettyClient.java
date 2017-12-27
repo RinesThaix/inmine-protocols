@@ -75,18 +75,22 @@ public abstract class NettyClient extends CallbackHandler implements NetworkClie
             this.callbackTickFuture = NettyUtil.getWorkerLoopGroup().scheduleWithFixedDelay(this::callbackTick, 50L, 50L, TimeUnit.MILLISECONDS);
         if (this.keepAliveFuture == null)
             this.keepAliveFuture = NettyUtil.getWorkerLoopGroup().scheduleWithFixedDelay(() -> {
-                if (this.connection == null)
-                    return;
-                long current = System.currentTimeMillis();
-                NettyPacketHandler handler = this.connection.getHandler();
-                if (current - handler.getLastPacketReceivedTime() > 40000L) {
-                    disconnect();
-                    this.shuttingDown = false;
-                    connect();
-                    return;
-                }
-                if (current - handler.getLastPacketSentTime() > 30000L) {
-                    sendPacket(new SPacketKeepAlive());
+                try {
+                    if (this.connection == null)
+                        return;
+                    long current = System.currentTimeMillis();
+                    NettyPacketHandler handler = this.connection.getHandler();
+                    if (current - handler.getLastPacketReceivedTime() > 40000L) {
+                        disconnect();
+                        this.shuttingDown = false;
+                        connect();
+                        return;
+                    }
+                    if (current - handler.getLastPacketSentTime() > 30000L) {
+                        sendPacket(new SPacketKeepAlive());
+                    }
+                }catch(Exception e2) {
+                    e2.printStackTrace();
                 }
             }, 1L, 1L, TimeUnit.SECONDS);
         this.connectFuture = this.bootstrap
