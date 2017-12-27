@@ -31,7 +31,6 @@ import java.util.logging.Logger;
 public abstract class NettyClient extends CallbackHandler implements NetworkClient {
 
     private final PacketRegistry packetRegistry;
-    private final Logger logger;
 
     private ScheduledFuture<?> callbackTickFuture = null;
     private NettyConnection connection;
@@ -47,8 +46,8 @@ public abstract class NettyClient extends CallbackHandler implements NetworkClie
     Consumer<Packet> packetSentListener;
 
     public NettyClient(Logger logger, PacketRegistry packetRegistry) {
+        super(logger);
         this.packetRegistry = packetRegistry;
-        this.logger = logger;
         this.statistics = new NetworkStatisticsImpl();
     }
 
@@ -89,8 +88,8 @@ public abstract class NettyClient extends CallbackHandler implements NetworkClie
                     if (current - handler.getLastPacketSentTime() > 30000L) {
                         sendPacket(new SPacketKeepAlive());
                     }
-                }catch(Exception e2) {
-                    e2.printStackTrace();
+                } catch (Exception ex) {
+                    logger.log(Level.WARNING, "Exception in keep-alive task", ex);
                 }
             }, 1L, 1L, TimeUnit.SECONDS);
         this.connectFuture = this.bootstrap
@@ -184,7 +183,7 @@ public abstract class NettyClient extends CallbackHandler implements NetworkClie
         try {
             sendPacket(new SPacketHandshake(getPacketRegistry().getVersion()));
         } catch (Exception ex) {
-            new Exception("Can not process connection callback", ex).printStackTrace();
+            logger.log(Level.WARNING, "Can not process connection callback", ex);
         }
         return this.connection;
     }
@@ -195,7 +194,7 @@ public abstract class NettyClient extends CallbackHandler implements NetworkClie
         try {
             onDisconnected();
         } catch (Exception ex) {
-            new Exception("Can not process disconnection callback", ex).printStackTrace();
+            logger.log(Level.WARNING, "Can not process disconnection callback", ex);
         }
         if (!this.shuttingDown)
             connect();

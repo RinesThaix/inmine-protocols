@@ -6,6 +6,8 @@ import org.inmine.network.Packet;
 import org.inmine.network.netty.NettyPacketHandler;
 import org.inmine.network.packet.SPacketHandshake;
 
+import java.util.logging.Level;
+
 /**
  * Created by RINES on 17.11.17.
  */
@@ -28,7 +30,7 @@ public class NettyServerPacketHandler extends NettyPacketHandler {
         try {
             server.onNewConnection(connection);
         } catch (Exception ex) {
-            new Exception("Can not process connection callback", ex).printStackTrace();
+            server.getLogger().log(Level.WARNING, "Can not process connection callback", ex);
         }
     }
 

@@ -33,7 +33,6 @@ import java.util.logging.Logger;
 public abstract class NettyServer extends CallbackHandler implements NetworkServer {
 
     private final PacketRegistry packetRegistry;
-    private final Logger logger;
 
     private final Map<SocketAddress, NettyConnection> connections = new ConcurrentHashMap<>();
 
@@ -45,8 +44,8 @@ public abstract class NettyServer extends CallbackHandler implements NetworkServ
     BiConsumer<Connection, Packet> packetSentListener;
 
     public NettyServer(Logger logger, PacketRegistry packetRegistry) {
+        super(logger);
         this.packetRegistry = packetRegistry;
-        this.logger = logger;
         this.statistics = new NetworkStatisticsImpl();
     }
 
@@ -86,8 +85,8 @@ public abstract class NettyServer extends CallbackHandler implements NetworkServ
                         if (current - handler.getLastPacketSentTime() > 30000L)
                             connection.sendPacket(new SPacketKeepAlive());
                     }
-                }catch(Exception e2) {
-                    e2.printStackTrace();
+                } catch (Exception ex) {
+                    logger.log(Level.WARNING, "Exception in keep-alive task", ex);
                 }
             }, 5L, 5L, TimeUnit.SECONDS);
     }
@@ -176,7 +175,7 @@ public abstract class NettyServer extends CallbackHandler implements NetworkServ
             connection.getHandler().setConnection(null);
             onDisconnecting(connection);
         } catch (Exception ex) {
-            new Exception("Can not process disconnection callback", ex).printStackTrace();
+            logger.log(Level.WARNING, "Can not process disconnection callback", ex);
         }
     }
 
