@@ -80,13 +80,13 @@ public class PacketDecoder extends ByteToMessageDecoder {
 
                 // Если не считаны все байты
                 if (buf.readerIndex() - readerIndex != length) {
-                    buf.readerIndex(readerIndex + length);
                     int diff = length - (buf.readerIndex() - readerIndex);
                     ctx.channel().attr(HandlerBoss.BOSS_KEY).get().getLogger().warning(
                         "After reading packet " + packet.getClass().getSimpleName() + ", there are " +
                             (diff > 0 ? diff + " bytes left" : -diff + " extra bytes read") +
                             " (length " + length + "). Packet ignored."
                     );
+                    buf.readerIndex(readerIndex + length);
                     return;
                 }
             } catch (Exception ex) {
