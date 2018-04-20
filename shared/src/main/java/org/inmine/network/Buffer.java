@@ -179,8 +179,9 @@ public abstract class Buffer {
     }
     
     public void writeString(String s) {
-        writeVarInt(s.length());
-        writeBytes(s.getBytes(StandardCharsets.UTF_8));
+        byte[] bytes = s.getBytes(StandardCharsets.UTF_8);
+        writeVarInt(bytes.length);
+        writeBytes(bytes);
     }
     
     public String readStringNullable(int maxLength) {
