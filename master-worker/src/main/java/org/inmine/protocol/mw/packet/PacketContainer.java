@@ -7,7 +7,6 @@ import org.inmine.network.Buffer;
 import org.inmine.network.Packet;
 import org.inmine.network.PacketRegistry;
 import org.inmine.network.netty.NettyBuffer;
-import org.inmine.network.netty.NettyBufferPool;
 
 /**
  * @author xtrafrancyz
@@ -51,7 +50,7 @@ abstract class PacketContainer extends Packet {
 
     public Packet getPacket(PacketRegistry registry) {
         if (packet == null) {
-            NettyBuffer buffer = NettyBufferPool.DEFAULT.wrap(Unpooled.wrappedBuffer(serialized));
+            NettyBuffer buffer = NettyBuffer.newInstance(Unpooled.wrappedBuffer(serialized));
             try {
                 int id = buffer.readVarInt();
                 Packet packet = registry.constructPacket(id);

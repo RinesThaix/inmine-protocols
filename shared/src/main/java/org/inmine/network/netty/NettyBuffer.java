@@ -2,7 +2,7 @@ package org.inmine.network.netty;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
-import io.netty.buffer.PooledByteBufAllocator;
+import io.netty.util.Recycler;
 
 import org.inmine.network.Buffer;
 
@@ -12,18 +12,19 @@ import java.nio.charset.StandardCharsets;
  * Created by RINES on 17.11.17.
  */
 public class NettyBuffer extends Buffer {
+    private static Recycler<NettyBuffer> RECYCLER = new Recycler<NettyBuffer>() {
+        @Override
+        protected NettyBuffer newObject(Handle<NettyBuffer> handle) {
+            return new NettyBuffer(handle);
+        }
+    };
 
-    private final NettyBufferPool pool;
+    private final Recycler.Handle<NettyBuffer> recycler;
     private ByteBuf buffer;
     private boolean releaseNetty = false;
 
-    public NettyBuffer(ByteBuf buffer) {
-        this(null, buffer);
-    }
-
-    NettyBuffer(NettyBufferPool pool, ByteBuf buffer) {
-        this.pool = pool;
-        this.buffer = buffer;
+    private NettyBuffer(Recycler.Handle<NettyBuffer> recycler) {
+        this.recycler = recycler;
     }
 
     public void setHandle(ByteBuf buffer) {
@@ -42,8 +43,8 @@ public class NettyBuffer extends Buffer {
 
     @Override
     public void release() {
-        if (pool != null)
-            pool.release(this);
+        setHandle(null);
+        recycler.recycle(this);
     }
 
     @Override
@@ -120,7 +121,7 @@ public class NettyBuffer extends Buffer {
 
     @Override
     public void writeString(String s) {
-        ByteBuf encoded = PooledByteBufAllocator.DEFAULT.buffer(ByteBufUtil.utf8MaxBytes(s));
+        ByteBuf encoded = buffer.alloc().buffer(ByteBufUtil.utf8MaxBytes(s));
         try {
             ByteBufUtil.writeUtf8(encoded, s);
             writeVarInt(encoded.readableBytes());
@@ -132,14 +133,18 @@ public class NettyBuffer extends Buffer {
 
     @Override
     public NettyBuffer newBuffer(int size) {
-        ByteBuf buf = buffer.alloc().buffer(size);
-        NettyBuffer wrapped;
-        if (pool != null)
-            wrapped = this.pool.wrap(buf);
-        else
-            wrapped = new NettyBuffer(buf);
+        NettyBuffer wrapped = newInstance(buffer.alloc().buffer(size));
         wrapped.releaseNetty = true;
         return wrapped;
     }
 
+    public static NettyBuffer newInstance() {
+        return RECYCLER.get();
+    }
+
+    public static NettyBuffer newInstance(ByteBuf buffer) {
+        NettyBuffer wrapper = RECYCLER.get();
+        wrapper.setHandle(buffer);
+        return wrapper;
+    }
 }

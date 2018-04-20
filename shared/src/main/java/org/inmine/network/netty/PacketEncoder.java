@@ -23,7 +23,7 @@ public class PacketEncoder extends MessageToByteEncoder<Packet> {
     @Override
     protected void encode(ChannelHandlerContext ctx, Packet packet, ByteBuf out) throws Exception {
         ByteBuf temp = ctx.alloc().buffer();
-        NettyBuffer buffer = NettyBufferPool.DEFAULT.wrap(temp);
+        NettyBuffer buffer = NettyBuffer.newInstance(temp);
         try {
             buffer.writeSignedVarInt(packet.getId());
             packet.write(buffer);

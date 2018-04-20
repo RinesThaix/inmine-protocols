@@ -64,7 +64,7 @@ public class PacketDecoder extends ByteToMessageDecoder {
             return;
         }
 
-        NettyBuffer buffer = NettyBufferPool.DEFAULT.wrap(buf);
+        NettyBuffer buffer = NettyBuffer.newInstance(buf);
         try {
             readerIndex = buf.readerIndex();
 
